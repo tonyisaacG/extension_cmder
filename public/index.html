@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cmder Multi-Tab Container</title>
+  <link rel="icon" type="image/x-icon" href="/assets/cmder.ico">
+  <link rel="stylesheet" href="/xterm/xterm/css/xterm.css">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <!-- Header Bar -->
+  <header class="app-header">
+    <div class="brand">
+      <img src="/assets/cmder.ico" alt="Cmder" class="brand-icon">
+      <span class="brand-title">Cmder Container</span>
+    </div>
+
+    <!-- Tab Bar -->
+    <div class="tabs-scroll-container">
+      <div class="tabs-list" id="tabsList">
+        <!-- Dynamic tabs will be inserted here -->
+      </div>
+      <button class="btn-action btn-add-tab" id="btnAddTab" title="New Tab (Ctrl+T)">
+        <span class="icon">+</span>
+      </button>
+      <button class="btn-action" id="btnOpenFolderTab" title="Open New Tab in Specific Folder">
+        <span class="icon">📁</span>
+      </button>
+    </div>
+
+    <!-- Quick Tools -->
+    <div class="header-tools">
+      <button class="tool-btn" id="btnToggleBroadcast" title="Toggle Broadcast Mode (Ctrl+B)">
+        <span class="tool-icon">⚡</span>
+        <span class="tool-label">Broadcast</span>
+      </button>
+      <button class="tool-btn" id="btnToggleGrid" title="Toggle Grid View (Ctrl+G)">
+        <span class="tool-icon">⊞</span>
+        <span class="tool-label">Grid</span>
+      </button>
+      
+      <!-- Guide / Help Button -->
+      <button class="tool-btn" id="btnOpenHelp" title="Guide & Shortcuts (Ctrl+H or Ctrl+I)">
+        <span class="tool-icon">ℹ️</span>
+        <span class="tool-label">Guide</span>
+      </button>
+
+      <!-- Workspaces Menu -->
+      <div class="dropdown">
+        <button class="tool-btn dropdown-toggle" id="btnWorkspaces">
+          <span class="tool-icon">💾</span>
+          <span class="tool-label">Workspaces</span>
+        </button>
+        <div class="dropdown-menu" id="workspacesMenu">
+          <div class="dropdown-item" id="btnSaveWorkspace">💾 Save Current Tabs...</div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-header">Saved Workspaces</div>
+          <div id="savedWorkspacesList" class="saved-list">
+            <span class="empty-hint">No saved workspaces</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Broadcast Command Bar (Collapsible) -->
+  <div class="broadcast-bar hidden" id="broadcastBar">
+    <div class="broadcast-inner">
+      <span class="broadcast-tag">⚡ BROADCAST COMMAND</span>
+      <input type="text" id="broadcastInput" placeholder="Type command to run across selected tabs (e.g. git pull)..." autocomplete="off">
+      <div class="broadcast-targets" id="broadcastTargets">
+        <label><input type="checkbox" id="chkAllTabs" checked> All Tabs</label>
+      </div>
+      <button class="btn-primary" id="btnSendBroadcast">Execute in Tabs</button>
+      <button class="btn-icon" id="btnCloseBroadcast">✕</button>
+    </div>
+  </div>
+
+  <!-- Terminal View Area -->
+  <main class="terminal-viewport" id="terminalViewport">
+    <!-- Tab terminal containers will be injected here -->
+  </main>
+
+  <!-- Status Bar / Shortcut hints -->
+  <footer class="app-statusbar">
+    <div class="status-left">
+      <span class="status-pill active-path" id="statusActivePath">Loading path...</span>
+      <span class="status-pill cmder-status" id="statusCmder">Cmder Active</span>
+    </div>
+    <div class="status-shortcuts">
+      <span><kbd>Alt+T</kbd> New</span>
+      <span><kbd>Alt+W</kbd> Close</span>
+      <span><kbd>Alt+←/→</kbd> Navigate</span>
+      <span><kbd>Alt+1..9</kbd> Jump</span>
+      <span><kbd>Alt+B</kbd> Broadcast</span>
+      <span><kbd>Alt+G</kbd> Grid</span>
+      <span><kbd>Alt+H</kbd> Guide</span>
+    </div>
+  </footer>
+
+  <!-- Guide / Cheat Sheet Modal -->
+  <div class="modal-overlay hidden" id="helpModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span class="icon">ℹ️</span>
+          <h2>Cmder Container — Guide & Abbreviations</h2>
+        </div>
+        <button class="modal-close" id="btnCloseHelp" title="Close (Esc)">✕</button>
+      </div>
+      <div class="modal-body">
+        
+        <!-- Section 1: Keyboard Abbreviations / Shortcuts -->
+        <div class="guide-section">
+          <h3>⚡ Keyboard Shortcuts & Abbreviations (Browser Friendly)</h3>
+          <p style="font-size:11px; color:#2ecc71; margin-bottom:8px;">
+            💡 <b>Note:</b> We use <code>Alt + Key</code> shortcuts so they <b>never conflict</b> with Chrome, Edge, or Windows browser tabs!
+          </p>
+          <table class="shortcuts-table">
+            <thead>
+              <tr>
+                <th>Shortcut</th>
+                <th>Action</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><kbd>Ctrl</kbd> + <kbd>C</kbd> <i>(or Auto-Select)</i></td>
+                <td><b>Copy Text</b></td>
+                <td>Select text with mouse to auto-copy, or press Ctrl+C</td>
+              </tr>
+              <tr>
+                <td><kbd>Ctrl</kbd> + <kbd>V</kbd> <i>(or Right Click)</i></td>
+                <td><b>Paste Text</b></td>
+                <td>Pastes clipboard text directly into the active terminal</td>
+              </tr>
+              <tr>
+                <td><kbd>Alt</kbd> + <kbd>T</kbd> <i>(or Ctrl+T)</i></td>
+                <td><b>New Tab</b></td>
+                <td>Opens a new isolated Cmder tab (No conflict with Chrome!)</td>
+              </tr>
+              <tr>
+                <td><kbd>Alt</kbd> + <kbd>W</kbd> <i>(or Ctrl+W)</i></td>
+                <td><b>Close Tab</b></td>
+                <td>Safely closes active tab (Will not close Chrome window)</td>
+              </tr>
+              <tr>
+                <td><kbd>Alt</kbd> + <kbd>←</kbd> / <kbd>→</kbd></td>
+                <td><b>Move Between Tabs</b></td>
+                <td>Navigate left / right between tabs using arrow keys</td>
+              </tr>
+              <tr>
+                <td><kbd>Ctrl</kbd> + <kbd>Tab</kbd></td>
+                <td><b>Cycle Tabs</b></td>
+                <td>Quickly cycle through tabs forward / backward</td>
+              </tr>
+              <tr>
+                <td><kbd>Alt</kbd> + <kbd>1</kbd> .. <kbd>9</kbd></td>
+                <td><b>Jump to Tab</b></td>
+                <td>Instantly switches directly to Tab #1 through Tab #9</td>
+              </tr>
+              <tr>
+                <td><kbd>Alt</kbd> + <kbd>B</kbd></td>
+                <td><b>Broadcast</b></td>
+                <td>Toggles the broadcast bar to run a command across all tabs</td>
+              </tr>
+              <tr>
+                <td><kbd>Alt</kbd> + <kbd>G</kbd></td>
+                <td><b>Grid View</b></td>
+                <td>Toggles between single full-screen tab and multi-tab grid view</td>
+              </tr>
+              <tr>
+                <td><kbd>Alt</kbd> + <kbd>H</kbd> / <kbd>F1</kbd></td>
+                <td><b>Help Guide</b></td>
+                <td>Opens / closes this guide window</td>
+              </tr>
+              <tr>
+                <td><kbd>Double Click</kbd></td>
+                <td><b>Rename Tab</b></td>
+                <td>Double-click any tab title to name it (e.g. Frontend, DB)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Section 2: How to Use Features -->
+        <div class="guide-section">
+          <h3>📁 Managing Multiple Project Folders</h3>
+          <p>
+            Click the <span class="badge-icon">📁</span> button in the top bar to open a tab directly in any folder on your PC.
+            Each tab maintains its own independent working directory, so you can work on 10+ projects side-by-side without losing your paths.
+          </p>
+        </div>
+
+        <div class="guide-section">
+          <h3>⚡ Broadcast Mode (Inter-Tab Connection)</h3>
+          <p>
+            Press <kbd>Ctrl + B</kbd> to open the broadcast bar. Type any command (such as <code>git pull</code>, <code>npm test</code>, or <code>dir</code>) and press <b>Enter</b> to execute it across all your open tabs simultaneously!
+          </p>
+        </div>
+
+        <div class="guide-section">
+          <h3>💾 Automatic Tab Caching (Session Memory)</h3>
+          <p>
+            Your open tabs, folder paths, and custom names are <b>automatically saved</b> in real-time. Whenever you close and reopen the app, all your tabs reload right where you left off.
+          </p>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary" id="btnGotIt">Got it!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/xterm/xterm/lib/xterm.js"></script>
+  <script src="/xterm/addon-fit/lib/addon-fit.js"></script>
+  <script type="module" src="/js/main.js"></script>
+</body>
+</html>
