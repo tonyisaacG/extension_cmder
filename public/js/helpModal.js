@@ -24,3 +24,11 @@ export function toggleHelpModal(show) {
 export function isHelpModalOpen() {
   return !helpModal.classList.contains('hidden');
 }
+
+// Wire up footer shortcut helper button
+const statusHelpTrigger = document.getElementById('statusHelpTrigger');
+if (statusHelpTrigger) {
+  statusHelpTrigger.addEventListener('click', () => {
+    toggleHelpModal(true);
+  });
+}

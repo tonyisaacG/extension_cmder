@@ -9,13 +9,19 @@ const terminalViewportEl = document.getElementById('terminalViewport');
 const statusActivePath = document.getElementById('statusActivePath');
 
 /**
- * Creates a new tab with an isolated terminal instance
+ * Creates a new tab with an isolated terminal instance.
+ * If cwd is omitted, automatically inherits the active tab's current folder!
  */
 export function createTab(cwd = '', title = '') {
   state.tabCounter++;
   const tabId = `tab_${Date.now()}_${state.tabCounter}`;
   const tabIndex = state.tabs.size + 1;
-  const folderName = cwd ? cwd.split(/[\\/]/).filter(Boolean).pop() : 'Root';
+
+  // Inherit active tab's cwd when opening a new tab normally
+  const activeTab = state.tabs.get(state.activeTabId);
+  const targetCwd = cwd || (activeTab && activeTab.cwd ? activeTab.cwd : state.defaultCwd);
+
+  const folderName = targetCwd ? targetCwd.split(/[\\/]/).filter(Boolean).pop() : 'Root';
   const tabTitle = title || folderName || `Tab ${tabIndex}`;
 
   // Terminal DOM Container Pane
@@ -72,8 +78,8 @@ export function createTab(cwd = '', title = '') {
   const tabData = {
     id: tabId,
     title: tabTitle,
-    cwd: cwd || state.defaultCwd,
-    customName: false,
+    cwd: targetCwd,
+    customName: Boolean(title),
     term,
     fitAddon,
     element: paneEl,
@@ -86,7 +92,7 @@ export function createTab(cwd = '', title = '') {
   sendWs({
     type: 'create',
     tabId,
-    cwd: cwd || state.defaultCwd,
+    cwd: targetCwd,
     cols: term.cols || 80,
     rows: term.rows || 24
   });
@@ -246,7 +252,7 @@ export function updateStatusBar() {
 }
 
 /**
- * Open folder picker dialog
+ * Open folder picker dialog and create a NEW tab in the selected project folder
  */
 export async function openInFolder() {
   try {

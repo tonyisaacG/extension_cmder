@@ -21,45 +21,71 @@
       <div class="tabs-list" id="tabsList">
         <!-- Dynamic tabs will be inserted here -->
       </div>
-      <button class="btn-action btn-add-tab" id="btnAddTab" title="New Tab (Ctrl+T)">
+      <button class="btn-action btn-add-tab" id="btnAddTab" title="New Tab in Current Folder (Alt+T)">
         <span class="icon">+</span>
       </button>
-      <button class="btn-action" id="btnOpenFolderTab" title="Open New Tab in Specific Folder">
+      <button class="btn-action" id="btnOpenFolderTab" title="Open New Tab in Specific Folder (📁)">
         <span class="icon">📁</span>
       </button>
     </div>
 
     <!-- Quick Tools -->
     <div class="header-tools">
-      <button class="tool-btn" id="btnToggleBroadcast" title="Toggle Broadcast Mode (Ctrl+B)">
-        <span class="tool-icon">⚡</span>
-        <span class="tool-label">Broadcast</span>
-      </button>
-      <button class="tool-btn" id="btnToggleGrid" title="Toggle Grid View (Ctrl+G)">
-        <span class="tool-icon">⊞</span>
-        <span class="tool-label">Grid</span>
-      </button>
-      
-      <!-- Guide / Help Button -->
-      <button class="tool-btn" id="btnOpenHelp" title="Guide & Shortcuts (Ctrl+H or Ctrl+I)">
-        <span class="tool-icon">ℹ️</span>
-        <span class="tool-label">Guide</span>
-      </button>
-
-      <!-- Workspaces Menu -->
-      <div class="dropdown">
-        <button class="tool-btn dropdown-toggle" id="btnWorkspaces">
-          <span class="tool-icon">💾</span>
-          <span class="tool-label">Workspaces</span>
+      <!-- Layout & View Group -->
+      <div class="tool-group">
+        <button class="tool-btn" id="btnToggleGrid" title="Toggle Split Grid (Alt+G)">
+          <span class="tool-icon">⊞</span>
+          <span class="tool-label">Grid</span>
         </button>
-        <div class="dropdown-menu" id="workspacesMenu">
-          <div class="dropdown-item" id="btnSaveWorkspace">💾 Save Current Tabs...</div>
-          <div class="dropdown-divider"></div>
-          <div class="dropdown-header">Saved Workspaces</div>
-          <div id="savedWorkspacesList" class="saved-list">
-            <span class="empty-hint">No saved workspaces</span>
+        <button class="tool-btn" id="btnToggleBroadcast" title="Toggle Broadcast Mode (Alt+B)">
+          <span class="tool-icon">⚡</span>
+          <span class="tool-label">Broadcast</span>
+        </button>
+      </div>
+
+      <div class="tool-divider"></div>
+
+      <!-- Power Features Group -->
+      <div class="tool-group">
+        <button class="tool-btn" id="btnOpenScripts" title="Saved Scripts & Batch Store (Alt+S)">
+          <span class="tool-icon">📜</span>
+          <span class="tool-label">Scripts</span>
+        </button>
+        <button class="tool-btn" id="btnOpenVault" title="Secrets & Credentials Vault (Alt+V)">
+          <span class="tool-icon">🔐</span>
+          <span class="tool-label">Vault</span>
+        </button>
+        <button class="tool-btn" id="btnOpenSnapshots" title="Session Snapshots & Buffer Memory (Alt+M)">
+          <span class="tool-icon">📸</span>
+          <span class="tool-label">Snapshots</span>
+        </button>
+        <!-- Workspaces Menu -->
+        <div class="dropdown">
+          <button class="tool-btn dropdown-toggle" id="btnWorkspaces" title="Workspaces Management">
+            <span class="tool-icon">💾</span>
+            <span class="tool-label">Workspaces</span>
+          </button>
+          <div class="dropdown-menu" id="workspacesMenu">
+            <div class="dropdown-item" id="btnSaveWorkspace">💾 Save Current Tabs...</div>
+            <div class="dropdown-divider"></div>
+            <div class="dropdown-header">Saved Workspaces</div>
+            <div id="savedWorkspacesList" class="saved-list">
+              <span class="empty-hint">No saved workspaces</span>
+            </div>
           </div>
         </div>
+      </div>
+
+      <div class="tool-divider"></div>
+
+      <!-- Quick Actions & Help -->
+      <div class="tool-group">
+        <button class="tool-btn tool-btn-icon-only" id="btnClearTerminal" title="Clear Screen & Buffer (Alt+K)">
+          <span class="tool-icon">🧹</span>
+        </button>
+        <button class="tool-btn tool-btn-icon-only" id="btnOpenHelp" title="Guide & Shortcuts (Alt+H or F1)">
+          <span class="tool-icon">ℹ️</span>
+        </button>
       </div>
     </div>
   </header>
@@ -82,22 +108,209 @@
     <!-- Tab terminal containers will be injected here -->
   </main>
 
-  <!-- Status Bar / Shortcut hints -->
+  <!-- Status Bar / Uncluttered Footer -->
   <footer class="app-statusbar">
     <div class="status-left">
       <span class="status-pill active-path" id="statusActivePath">Loading path...</span>
-      <span class="status-pill cmder-status" id="statusCmder">Cmder Active</span>
+      <span class="status-pill cmder-status" id="statusCmder"><span class="status-dot"></span> Cmder Active</span>
+      <span class="status-pill conn-status" id="statusConn">Online</span>
     </div>
-    <div class="status-shortcuts">
-      <span><kbd>Alt+T</kbd> New</span>
-      <span><kbd>Alt+W</kbd> Close</span>
-      <span><kbd>Alt+←/→</kbd> Navigate</span>
-      <span><kbd>Alt+1..9</kbd> Jump</span>
-      <span><kbd>Alt+B</kbd> Broadcast</span>
-      <span><kbd>Alt+G</kbd> Grid</span>
-      <span><kbd>Alt+H</kbd> Guide</span>
+    <div class="status-right">
+      <button class="status-btn" id="statusHelpTrigger" title="View Keyboard Shortcuts & Guide (Alt+H or F1)">
+        <kbd>Alt+H</kbd> Shortcuts & Guide
+      </button>
     </div>
   </footer>
+
+  <!-- Scripts & Batch Store Modal (Alt+S) -->
+  <div class="modal-overlay hidden" id="scriptsModal">
+    <div class="modal-card modal-card-wide">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span class="icon">📜</span>
+          <h2>Saved Scripts & Batch Store (<kbd>run_c</kbd>)</h2>
+        </div>
+        <button class="modal-close" id="btnCloseScripts" title="Close (Esc)">✕</button>
+      </div>
+      <div class="modal-body scripts-modal-body">
+        
+        <!-- Search and Action Bar -->
+        <div class="scripts-top-bar">
+          <div class="scripts-search-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="scriptsSearchInput" placeholder="Search scripts or type name to run (Enter executes top match)..." autocomplete="off">
+          </div>
+          <button class="btn-primary" id="btnAddNewScript">➕ New Script</button>
+        </div>
+
+        <!-- Inline Script Editor (Collapsible) -->
+        <div class="script-editor-card hidden" id="scriptEditorCard">
+          <h3 id="editorTitle">Create New Script</h3>
+          <div class="editor-row">
+            <div class="editor-field field-half">
+              <label>Script Name (Called via <code>run_c &lt;name&gt;</code>):</label>
+              <input type="text" id="inputScriptName" placeholder="e.g. server_ssh, start_backend, db_tunnel">
+            </div>
+            <div class="editor-field field-half">
+              <label>Category / Tag:</label>
+              <input type="text" id="inputScriptCategory" placeholder="e.g. Servers, Credentials, Dev, Git">
+            </div>
+          </div>
+          <div class="editor-field">
+            <label>Description (Purpose / Notes):</label>
+            <input type="text" id="inputScriptDesc" placeholder="e.g. Login to server with credentials and open session">
+          </div>
+          <div class="editor-field">
+            <label>Batch Script Content (Executes in Cmder terminal):</label>
+            <textarea id="inputScriptContent" rows="6" placeholder="@echo off&#10;echo Connecting...&#10;ssh user@server.com"></textarea>
+          </div>
+          <div class="editor-buttons">
+            <button class="btn-primary" id="btnSaveScript">💾 Save Script</button>
+            <button class="btn-secondary" id="btnCancelScriptEdit">Cancel</button>
+          </div>
+        </div>
+
+        <!-- Scripts List & Suggestions -->
+        <div class="scripts-list-container" id="scriptsListContainer">
+          <!-- Dynamically populated -->
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Secrets & Notes Vault Modal (Alt+V) -->
+  <div class="modal-overlay hidden" id="vaultModal">
+    <div class="modal-card modal-card-wide">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span class="icon">🔐</span>
+          <h2>Secrets & Notes Vault (<kbd>pass_c</kbd> / <kbd>Alt+V</kbd>)</h2>
+        </div>
+        <button class="modal-close" id="btnCloseVault" title="Close (Esc)">✕</button>
+      </div>
+      <div class="modal-body scripts-modal-body">
+        
+        <!-- Search and Action Bar -->
+        <div class="scripts-top-bar">
+          <div class="scripts-search-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="vaultSearchInput" placeholder="Search abbreviation (e.g. 109, db) — Press Enter to Paste into Tab..." autocomplete="off">
+          </div>
+          <button class="btn-primary" id="btnAddNewVaultItem">➕ New Secret / Note</button>
+        </div>
+
+        <!-- Inline Vault Item Editor (Collapsible) -->
+        <div class="script-editor-card hidden" id="vaultEditorCard">
+          <h3 id="vaultEditorTitle">Add Secret / Password / Note</h3>
+          <div class="editor-row">
+            <div class="editor-field field-half">
+              <label>Abbreviation / Key (Called via <code>pass_c &lt;key&gt;</code>):</label>
+              <input type="text" id="inputVaultKey" placeholder="e.g. server_109, root_pass, db_token">
+            </div>
+            <div class="editor-field field-half">
+              <label>Type:</label>
+              <select id="selectVaultType" class="editor-select">
+                <option value="Password">Password / Credential</option>
+                <option value="Token">API Token / Secret Key</option>
+                <option value="Note">Quick Note</option>
+                <option value="Snippet">Command Snippet</option>
+              </select>
+            </div>
+          </div>
+          <div class="editor-field">
+            <label>Title / Description:</label>
+            <input type="text" id="inputVaultTitle" placeholder="e.g. Root password for server 109">
+          </div>
+          <div class="editor-field">
+            <label>Value (Password / Token / Note content):</label>
+            <textarea id="inputVaultValue" rows="3" placeholder="Enter sensitive value or note here..."></textarea>
+          </div>
+          <div class="editor-field-checkbox">
+            <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#cccccc; cursor:pointer;">
+              <input type="checkbox" id="chkVaultIsSecret" checked> Mask value with •••••• (Hidden on screen)
+            </label>
+          </div>
+          <div class="editor-buttons">
+            <button class="btn-primary" id="btnSaveVaultItem">💾 Save to Vault</button>
+            <button class="btn-secondary" id="btnCancelVaultEdit">Cancel</button>
+          </div>
+        </div>
+
+        <!-- Vault Items List -->
+        <div class="vault-list-container" id="vaultListContainer">
+          <!-- Dynamically populated -->
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Session Snapshots & Buffer Memory Modal (Alt+M) -->
+  <div class="modal-overlay hidden" id="snapshotsModal">
+    <div class="modal-card modal-card-wide">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span class="icon">📸</span>
+          <h2>Session Snapshots & Buffer Memory (<kbd>Alt+M</kbd>)</h2>
+        </div>
+        <div class="modal-header-actions" style="display:flex; align-items:center; gap:8px;">
+          <button class="btn-secondary" id="btnModalClearSession" title="Clear Screen & Buffer (Alt+K)">🧹 Clear Screen</button>
+          <button class="btn-secondary" id="btnModalResetSession" title="Reset Shell Process">🔄 Reset Shell</button>
+          <button class="modal-close" id="btnCloseSnapshots" title="Close (Esc)">✕</button>
+        </div>
+      </div>
+      <div class="modal-body scripts-modal-body">
+        
+        <!-- Search and Snapshot Trigger Bar -->
+        <div class="scripts-top-bar" style="flex-wrap: wrap; gap: 8px;">
+          <div class="scripts-search-wrapper" style="flex: 1; min-width: 200px;">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="snapshotsSearchInput" placeholder="Search snapshots by title, path, or output content..." autocomplete="off">
+          </div>
+          <div style="display:flex; gap:6px; flex-wrap: wrap;">
+            <button class="btn-primary" id="btnSnapshotActiveTab" title="Capture active tab's full output and commands">📸 Snapshot Active</button>
+            <button class="btn-secondary" id="btnSnapshotAllTabs" title="Capture all tabs in workspace">📸 Snapshot All</button>
+            <button class="btn-secondary" id="btnExportActiveMd" title="Directly export active terminal buffer as Markdown (.md)">📝 Export MD</button>
+            <button class="btn-secondary" id="btnExportActiveImg" title="Directly export active terminal buffer as PNG Image (.png)">🖼️ Export Image</button>
+            <button class="btn-secondary" id="btnShowSnapshotForm" title="Custom snapshot title">⚙️ Custom...</button>
+          </div>
+        </div>
+
+        <!-- Collapsible Custom Snapshot Form -->
+        <div class="script-editor-card hidden" id="snapshotFormCard">
+          <h3>Create Custom Session Snapshot</h3>
+          <div class="editor-row">
+            <div class="editor-field field-half">
+              <label>Snapshot Title:</label>
+              <input type="text" id="inputSnapshotTitle" placeholder="e.g. Deploy API & Redis Logs">
+            </div>
+            <div class="editor-field field-half">
+              <label>Target Scope:</label>
+              <select id="selectSnapshotScope" class="editor-select">
+                <option value="active">Active Tab Only</option>
+                <option value="all">All Open Tabs</option>
+              </select>
+            </div>
+          </div>
+          <div class="editor-field">
+            <label>Description / Notes:</label>
+            <input type="text" id="inputSnapshotDesc" placeholder="e.g. Captured before applying database migration v3">
+          </div>
+          <div class="editor-buttons">
+            <button class="btn-primary" id="btnSaveSnapshotForm">💾 Save Snapshot</button>
+            <button class="btn-secondary" id="btnCancelSnapshotForm">Cancel</button>
+          </div>
+        </div>
+
+        <!-- Snapshots List Container -->
+        <div class="scripts-list-container" id="snapshotsListContainer">
+          <!-- Dynamically populated -->
+        </div>
+
+      </div>
+    </div>
+  </div>
 
   <!-- Guide / Cheat Sheet Modal -->
   <div class="modal-overlay hidden" id="helpModal">
@@ -127,22 +340,37 @@
             </thead>
             <tbody>
               <tr>
-                <td><kbd>Ctrl</kbd> + <kbd>C</kbd> <i>(or Auto-Select)</i></td>
-                <td><b>Copy Text</b></td>
-                <td>Select text with mouse to auto-copy, or press Ctrl+C</td>
+                <td><kbd>Ctrl</kbd> + <kbd>C</kbd></td>
+                <td><b>Cancel / Copy</b></td>
+                <td>Copies selected text cleanly, or sends SIGINT break to cancel command if no selection</td>
               </tr>
               <tr>
                 <td><kbd>Ctrl</kbd> + <kbd>V</kbd> <i>(or Right Click)</i></td>
                 <td><b>Paste Text</b></td>
-                <td>Pastes clipboard text directly into the active terminal</td>
+                <td>Pastes clipboard text directly into the active terminal once</td>
               </tr>
               <tr>
-                <td><kbd>Alt</kbd> + <kbd>T</kbd> <i>(or Ctrl+T)</i></td>
+                <td><kbd>Ctrl</kbd> + <kbd>Q</kbd>, <kbd>R</kbd>, <kbd>W</kbd>, etc.</td>
+                <td><b>Cmder Native</b></td>
+                <td>All Ctrl keys (Ctrl+Q quit pager/branches, Ctrl+R history search, Ctrl+W erase word) pass directly to Cmder!</td>
+              </tr>
+              <tr>
+                <td><kbd>Alt</kbd> + <kbd>T</kbd></td>
                 <td><b>New Tab</b></td>
-                <td>Opens a new isolated Cmder tab (No conflict with Chrome!)</td>
+                <td>Opens new isolated tab in the <b>same folder</b> as the current tab</td>
               </tr>
               <tr>
-                <td><kbd>Alt</kbd> + <kbd>W</kbd> <i>(or Ctrl+W)</i></td>
+                <td><kbd>Alt</kbd> + <kbd>S</kbd></td>
+                <td><b>Scripts Store</b></td>
+                <td>Opens Saved Scripts & Batch store to run/suggest custom routines</td>
+              </tr>
+              <tr>
+                <td><kbd>Alt</kbd> + <kbd>V</kbd></td>
+                <td><b>Vault Store</b></td>
+                <td>Opens Secrets & Notes Vault to paste passwords with 1-click</td>
+              </tr>
+              <tr>
+                <td><kbd>Alt</kbd> + <kbd>W</kbd></td>
                 <td><b>Close Tab</b></td>
                 <td>Safely closes active tab (Will not close Chrome window)</td>
               </tr>
@@ -150,11 +378,6 @@
                 <td><kbd>Alt</kbd> + <kbd>←</kbd> / <kbd>→</kbd></td>
                 <td><b>Move Between Tabs</b></td>
                 <td>Navigate left / right between tabs using arrow keys</td>
-              </tr>
-              <tr>
-                <td><kbd>Ctrl</kbd> + <kbd>Tab</kbd></td>
-                <td><b>Cycle Tabs</b></td>
-                <td>Quickly cycle through tabs forward / backward</td>
               </tr>
               <tr>
                 <td><kbd>Alt</kbd> + <kbd>1</kbd> .. <kbd>9</kbd></td>
@@ -185,19 +408,31 @@
           </table>
         </div>
 
-        <!-- Section 2: How to Use Features -->
+        <!-- Section 2: Scripts Store & run_c CLI -->
+        <div class="guide-section">
+          <h3>📜 Custom Batch & Scripts Store (<kbd>run_c</kbd>)</h3>
+          <p>
+            You can save server logins, credentials, SSH commands, or dev scripts in the app:
+          </p>
+          <ul style="font-size:12px; margin-left: 18px; color: #ccc; line-height: 1.6;">
+            <li><b>In Terminal:</b> Type <code>run_c</code> to list all saved scripts. Type <code>run_c &lt;name&gt;</code> to execute!</li>
+            <li><b>In UI:</b> Click <b>Scripts</b> in the header or press <kbd>Alt + S</kbd> to search, get suggestions, and run with 1-click.</li>
+          </ul>
+        </div>
+
+        <!-- Section 3: How to Use Features -->
         <div class="guide-section">
           <h3>📁 Managing Multiple Project Folders</h3>
           <p>
             Click the <span class="badge-icon">📁</span> button in the top bar to open a tab directly in any folder on your PC.
-            Each tab maintains its own independent working directory, so you can work on 10+ projects side-by-side without losing your paths.
+            Pressing <kbd>Alt + T</kbd> or clicking <kbd>+</kbd> automatically opens new tabs in the <b>same folder</b> as your current tab.
           </p>
         </div>
 
         <div class="guide-section">
           <h3>⚡ Broadcast Mode (Inter-Tab Connection)</h3>
           <p>
-            Press <kbd>Ctrl + B</kbd> to open the broadcast bar. Type any command (such as <code>git pull</code>, <code>npm test</code>, or <code>dir</code>) and press <b>Enter</b> to execute it across all your open tabs simultaneously!
+            Press <kbd>Alt + B</kbd> to open the broadcast bar. Type any command (such as <code>git pull</code>, <code>npm test</code>, or <code>dir</code>) and press <b>Enter</b> to execute it across all your open tabs simultaneously!
           </p>
         </div>
 

@@ -126,3 +126,49 @@ term.onSelectionChange(() => {
 ### 3. Smart Right-Click:
 * Right-click with active selection: Copies selection.
 * Right-click without selection: Pastes clipboard text directly into the shell.
+
+---
+
+## 5. Architectural Separation: Cmder (`Ctrl`) vs Extension (`Alt`)
+
+To ensure that terminal commands and tools (like `git branch`, `less`, `clink`, `vim`, `nano`, `bash`, `ssh`) have full native fidelity, the application enforces a strict keyboard responsibility boundary:
+
+```mermaid
+graph LR
+    Key[User Key Combination]
+    Key -->|Alt + Key| Ext[Extension Container Action]
+    Key -->|Ctrl + Key| Cmder[Cmder Terminal Engine]
+    
+    subgraph ExtensionActions ["Extension Container (Alt)"]
+        AltT["Alt + T -> New Tab in CWD"]
+        AltW["Alt + W -> Close Active Tab"]
+        AltS["Alt + S -> Scripts & Batch Store"]
+        AltV["Alt + V -> Secrets & Notes Vault"]
+        AltB["Alt + B -> Broadcast Bar"]
+        AltG["Alt + G -> Grid View Toggle"]
+        AltNav["Alt + Arrows -> Navigate Tabs"]
+    end
+
+    subgraph CmderActions ["Cmder Native Shell (Ctrl)"]
+        CtrlQ["Ctrl + Q -> ASCII 17 (\x11) / Quit pager, resume output"]
+        CtrlC["Ctrl + C -> ASCII 03 (\x03) / SIGINT cancel command"]
+        CtrlR["Ctrl + R -> ASCII 18 (\x12) / Clink reverse history search"]
+        CtrlW["Ctrl + W -> ASCII 23 (\x17) / Clink delete previous word"]
+        CtrlA["Ctrl + A -> ASCII 01 (\x01) / Jump to line start"]
+        CtrlE["Ctrl + E -> ASCII 05 (\x05) / Jump to line end"]
+        CtrlL["Ctrl + L -> ASCII 12 (\x0c) / Clear screen"]
+        CtrlU["Ctrl + U -> ASCII 21 (\x15) / Delete entire line"]
+    end
+
+    Ext --> ExtensionActions
+    Cmder --> CmderActions
+```
+
+### Implementation Details:
+1. **`handleAppShortcut` Guard:** If `e.ctrlKey && !e.altKey`, the extension shortcut dispatcher immediately returns `true` and performs zero action.
+2. **Raw ASCII Control Byte Streaming:** In `term.attachCustomKeyEventHandler`, any `Ctrl + [A-Z]` keystroke inside the terminal:
+   * Calls `ev.preventDefault()` and `ev.stopPropagation()` to stop Chrome/Edge from executing browser actions (e.g., reloading on `Ctrl+R`, closing on `Ctrl+W`, printing on `Ctrl+P`, finding on `Ctrl+F`).
+   * Calculates the exact ASCII control byte `String.fromCharCode(ev.key.toUpperCase().charCodeAt(0) - 64)`.
+   * Sends the byte directly over WebSocket to the backend PTY (`node-pty` -> `cmd.exe / Clink`).
+3. **Pagers & Git Branch Output (`Ctrl + Q`):** Pressing `Ctrl + Q` sends `\x11` directly to Cmder, allowing users to quit pagers or control flow without any collision.
+

@@ -1,0 +1,16 @@
+[
+  {
+    "id": "snap_1792758188596",
+    "title": "fsdfsdf",
+    "description": "Snapshot of Main in E:\\2026\\MyBigProjects_SimpleLib\\extension_cmder",
+    "createdAt": "2026-10-23T12:40:38.987Z",
+    "tabs": [
+      {
+        "tabTitle": "Main",
+        "cwd": "E:\\2026\\MyBigProjects_SimpleLib\\extension_cmder",
+        "buffer": "\nE:\\2026\\MyBigProjects_SimpleLib\\extension_cmder (main -> origin) (cmder-container@1.0.0)\nλ\n\n── 📸 Restored Snapshot: [fsdfsdf] ──\n(Captured: 10/23/2026, 3:23:08 PM | Press Alt+M to update)\n\n\nClink v1.9.34 is available.\n- To apply the update, run 'clink update'.\n- To stop checking for updates, run 'clink set clink.autoupdate false'.\n- To view the release notes, visit the Releases page:\n  https://github.com/chrisant996/clink/releases\n\nE:\\2026\\MyBigProjects_SimpleLib\\extension_cmder (main -> origin) (cmder-container@1.0.0)\nλ ls\n ARCHITECTURE.md         docs/               PLAN.md        snapshots.json\n assets/                 feature.md          public/        user_scripts/\n bin/                    last_session.json   README.md      vault.json\n bugs.md                 node_modules/       run.bat        workspaces.json\n'Cmder Container.lnk'*  'origin)'            scripts.json\n create_shortcut.bat     package.json        server/\n custome_cmder.bat       package-lock.json   server.js\n\nE:\\2026\\MyBigProjects_SimpleLib\\extension_cmder (main -> origin) (cmder-container@1.0.0)\nλ cd ..\n\nE:\\2026\\MyBigProjects_SimpleLib\nλ cd /d g:/company projects/reporta;\nThe system cannot find the path specified.\n\nE:\\2026\\MyBigProjects_SimpleLib\nλ cd /d g:/company projects/reportal/reportal\n\ng:\\Company Projects\\Reportal\\Reportal\nλ cd reportal\n\ng:\\Company Projects\\Reportal\\Reportal\\Reportal (feat/crm-client-module -> origin)\nλ ls\nbin/                         launchSettings.json       Reportal.Service/\nDirectory.Build.props        obj/                      Reportal.SharedKernel/\nDirectory.Packages.props     README.md                 Reportal.slnLaunch.user\ndocker-compose.dcproj        Reportal.API/             Reportal.slnx\ndocker-compose.override.yml  Reportal.Application/     Reportal.Test/\ndocker-compose.yml           Reportal.CRM.Test/        Reportal.Web/\ndocs/                        Reportal.Domain/          scripts/\ninto.java                    Reportal.Infrastructure/\n\ng:\\Company Projects\\Reportal\\Reportal\\Reportal (feat/crm-client-module -> origin)\nλ",
+        "customName": true
+      }
+    ]
+  }
+]

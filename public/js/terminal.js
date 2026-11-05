@@ -21,7 +21,7 @@ export function showCopyToast(msg = '✓ Copied to clipboard!') {
 }
 
 /**
- * Initializes an xterm.js instance with enhanced Copy/Paste support
+ * Initializes an xterm.js instance with enhanced, deduplicated Copy/Paste support
  */
 export function createTerminalInstance(paneEl, tabId, onCustomKey) {
   const term = new Terminal({
@@ -39,68 +39,133 @@ export function createTerminalInstance(paneEl, tabId, onCustomKey) {
   term.loadAddon(fitAddon);
   term.open(paneEl);
 
-  // 1. Auto-Copy on selection (Classic Cmder / ConEmu feature)
-  term.onSelectionChange(() => {
-    if (term.hasSelection()) {
-      const selected = term.getSelection();
-      if (selected && selected.trim().length > 0) {
-        navigator.clipboard.writeText(selected).then(() => {
-          showCopyToast('✓ Copied selected text!');
-        }).catch(() => {});
+  // 1. Mouse selection auto-copy (Cleanly triggered ONCE on mouseup, avoiding repeated clipboard spam)
+  let lastCopiedSelection = '';
+  paneEl.addEventListener('mouseup', () => {
+    setTimeout(() => {
+      if (term.hasSelection()) {
+        const selected = term.getSelection();
+        if (selected && selected.trim().length > 0 && selected !== lastCopiedSelection) {
+          lastCopiedSelection = selected;
+          navigator.clipboard.writeText(selected).then(() => {
+            showCopyToast('✓ Copied selection!');
+          }).catch(() => {});
+        }
       }
-    }
+    }, 20);
   });
 
-  // 2. Keyboard shortcut interception (Copy, Paste & App shortcuts)
+  // 2. Keyboard shortcut interception: Clean split between Extension (Alt) and Cmder (Ctrl)
   term.attachCustomKeyEventHandler((ev) => {
     if (ev.type === 'keydown') {
-      // Ctrl+C or Ctrl+Shift+C: Copy if text is selected
-      if ((ev.ctrlKey && ev.key.toLowerCase() === 'c') ||
-          (ev.ctrlKey && ev.shiftKey && ev.key.toLowerCase() === 'c')) {
-        if (term.hasSelection()) {
-          const selected = term.getSelection();
-          navigator.clipboard.writeText(selected).then(() => {
-            showCopyToast('✓ Copied to clipboard!');
-            term.clearSelection();
-          });
-          return false; // Don't send SIGINT \x03
+      // A. Extension Shortcuts: STRICTLY Alt+Key (plus Escape / F1)
+      if (ev.altKey || ev.key === 'Escape' || ev.key === 'F1') {
+        if (onCustomKey) {
+          const handled = onCustomKey(ev);
+          if (handled === false) {
+            if (ev.preventDefault) ev.preventDefault();
+            if (ev.stopPropagation) ev.stopPropagation();
+            return false;
+          }
         }
-        // If NO selection, allow Ctrl+C to stop/cancel running command
         return true;
       }
 
-      // Ctrl+V or Ctrl+Shift+V: Paste from clipboard
-      if ((ev.ctrlKey && ev.key.toLowerCase() === 'v') ||
-          (ev.ctrlKey && ev.shiftKey && ev.key.toLowerCase() === 'v')) {
-        navigator.clipboard.readText().then((text) => {
-          if (text) {
-            sendWs({ type: 'data', tabId, data: text });
-          }
-        }).catch(() => {});
-        return false;
-      }
+      // B. Cmder Shortcuts: ALL Ctrl+Key combinations are sent DIRECTLY to Cmder
+      if (ev.ctrlKey && !ev.altKey) {
+        // Allow Developer Tools (Ctrl+Shift+I / Ctrl+Shift+J)
+        if (ev.shiftKey && (ev.key.toLowerCase() === 'i' || ev.key.toLowerCase() === 'j')) {
+          return true;
+        }
 
-      // Pass through other app shortcuts (Alt+T, Alt+W, Alt+Arrows, etc.)
-      if (onCustomKey) {
-        const handled = onCustomKey(ev);
-        if (handled === false) {
+        // 1. Copy text if selected (Ctrl+C or Ctrl+Shift+C)
+        if (ev.key.toLowerCase() === 'c' && term.hasSelection()) {
+          const selected = term.getSelection();
           if (ev.preventDefault) ev.preventDefault();
           if (ev.stopPropagation) ev.stopPropagation();
+          lastCopiedSelection = selected;
+          navigator.clipboard.writeText(selected).then(() => {
+            showCopyToast('✓ Copied to clipboard!');
+            term.clearSelection();
+          }).catch(() => {});
           return false;
         }
+
+        // 2. Paste from clipboard (Ctrl+V or Ctrl+Shift+V)
+        if (ev.key.toLowerCase() === 'v') {
+          if (ev.preventDefault) ev.preventDefault();
+          if (ev.stopPropagation) ev.stopPropagation();
+          navigator.clipboard.readText().then((text) => {
+            if (text) {
+              sendWs({ type: 'data', tabId, data: text });
+            }
+          }).catch(() => {});
+          return false;
+        }
+
+        // 3. Ctrl+C with NO selection: Send SIGINT (\x03) directly to cancel/stop running processes
+        if (ev.key.toLowerCase() === 'c') {
+          if (ev.preventDefault) ev.preventDefault();
+          if (ev.stopPropagation) ev.stopPropagation();
+          sendWs({ type: 'data', tabId, data: '\x03' });
+          return false;
+        }
+
+        // 4. Any letter key A-Z with Ctrl (Ctrl+Q, Ctrl+R, Ctrl+W, Ctrl+A, Ctrl+E, Ctrl+L, Ctrl+U, etc.)
+        const keyUpper = ev.key.toUpperCase();
+        if (keyUpper.length === 1 && keyUpper >= 'A' && keyUpper <= 'Z') {
+          if (ev.preventDefault) ev.preventDefault();
+          if (ev.stopPropagation) ev.stopPropagation();
+          // Convert letter to standard ASCII control byte (A=1, B=2, ..., Q=17, ..., Z=26)
+          const code = keyUpper.charCodeAt(0) - 64;
+          const ctrlChar = String.fromCharCode(code);
+          sendWs({ type: 'data', tabId, data: ctrlChar });
+          return false;
+        }
+
+        // 5. Special navigation and editing keys with Ctrl
+        const specialCtrlMap = {
+          '[': '\x1b',
+          '\\': '\x1c',
+          ']': '\x1d',
+          '^': '\x1e',
+          '_': '\x1f',
+          'ArrowLeft': '\x1b[1;5D',
+          'ArrowRight': '\x1b[1;5C',
+          'ArrowUp': '\x1b[1;5A',
+          'ArrowDown': '\x1b[1;5B',
+          'Backspace': '\x17',
+          'Delete': '\x1b[3;5~',
+          'Home': '\x1b[1;5H',
+          'End': '\x1b[1;5F',
+          'Tab': '\t'
+        };
+
+        if (specialCtrlMap[ev.key]) {
+          if (ev.preventDefault) ev.preventDefault();
+          if (ev.stopPropagation) ev.stopPropagation();
+          sendWs({ type: 'data', tabId, data: specialCtrlMap[ev.key] });
+          return false;
+        }
+
+        // Prevent browser defaults for any remaining unmapped Ctrl combinations
+        if (ev.preventDefault) ev.preventDefault();
+        return true;
       }
     }
     return true;
   });
 
-  // 3. Right-Click Context Menu: Fast Copy & Paste (Cmder style)
+  // 3. Right-Click Context Menu: Fast Copy & Paste without duplicates
   paneEl.addEventListener('contextmenu', async (e) => {
     e.preventDefault();
+    e.stopPropagation();
     if (term.hasSelection()) {
       const selected = term.getSelection();
       try {
+        lastCopiedSelection = selected;
         await navigator.clipboard.writeText(selected);
-        showCopyToast('✓ Copied!');
+        showCopyToast('✓ Copied to clipboard!');
         term.clearSelection();
       } catch (_) {}
     } else {

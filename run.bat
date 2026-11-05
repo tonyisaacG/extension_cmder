@@ -6,16 +6,15 @@ echo ========================================================
 echo   Launching Cmder Multi-Tab Container...
 echo ========================================================
 
-:: Check if server is already running on port 5321
-netstat -ano | findstr :5321 >nul
-if %ERRORLEVEL% equ 0 (
-    echo Server is already active on port 5321.
-) else (
-    echo Starting background server...
-    start /b node server.js >nul 2>&1
-    :: Wait 1 second for server to initialize
-    timeout /t 1 /nobreak >nul
+:: Stop any stale server process on port 5321 to ensure the latest features are loaded
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr :5321') do (
+    taskkill /F /PID %%a >nul 2>&1
 )
+timeout /t 1 /nobreak >nul
+
+echo Starting background server silently...
+powershell -NoProfile -WindowStyle Hidden -Command "Start-Process node -ArgumentList 'server.js' -WorkingDirectory '%~dp0' -WindowStyle Hidden"
+timeout /t 1 /nobreak >nul
 
 :: Find browser for standalone App Mode (Edge, Chrome, or default)
 set BROWSER_CMD=
@@ -37,4 +36,4 @@ if defined BROWSER_CMD (
     start http://localhost:5321
 )
 
-exit
+exit /b

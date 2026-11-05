@@ -1,17 +1,22 @@
 /**
  * Cmder Multi-Tab Container — Application Entry Point
  */
-import { state } from './state.js';
+import { state, sendWs } from './state.js';
 import { createTab, switchTab, closeTab, navigateTab, openInFolder, updateTabDisplay, updateStatusBar } from './tabManager.js';
 import { toggleBroadcast, executeBroadcast } from './broadcast.js';
 import { toggleGridLayout } from './grid.js';
 import { toggleHelpModal } from './helpModal.js';
 import { handleAppShortcut } from './shortcuts.js';
 import { autoSaveSession, restoreLastSession, saveCurrentWorkspace, loadWorkspacesList } from './session.js';
+import { initScriptsManager, toggleScriptsModal } from './scriptsManager.js';
+import { initVaultManager, toggleVaultModal } from './vaultManager.js';
+import { initSnapshotManager } from './snapshotManager.js';
 
 // DOM Controls
 const btnAddTab = document.getElementById('btnAddTab');
 const btnOpenFolderTab = document.getElementById('btnOpenFolderTab');
+const btnOpenScripts = document.getElementById('btnOpenScripts');
+const btnOpenVault = document.getElementById('btnOpenVault');
 const btnToggleBroadcast = document.getElementById('btnToggleBroadcast');
 const btnToggleGrid = document.getElementById('btnToggleGrid');
 const btnOpenHelp = document.getElementById('btnOpenHelp');
@@ -24,20 +29,63 @@ const btnWorkspaces = document.getElementById('btnWorkspaces');
 const workspacesMenu = document.getElementById('workspacesMenu');
 const btnSaveWorkspace = document.getElementById('btnSaveWorkspace');
 const statusCmder = document.getElementById('statusCmder');
+const statusConn = document.getElementById('statusConn');
 
-// 1. Initialize WebSocket Connection
+let pingIntervalId = null;
+let isInitialConnect = true;
+
+// 1. Initialize WebSocket Connection with Resilient Heartbeat & Re-attach
 function initWebSocket() {
+  if (pingIntervalId) {
+    clearInterval(pingIntervalId);
+    pingIntervalId = null;
+  }
+
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   state.ws = new WebSocket(`${protocol}//${window.location.host}`);
 
   state.ws.onopen = () => {
     console.log('Connected to backend PTY server');
-    fetchAppInfo();
+    if (statusConn) {
+      statusConn.textContent = 'Online';
+      statusConn.classList.remove('disconnected');
+    }
+
+    // Keepalive ping every 15 seconds to prevent idle socket drop or freeze
+    pingIntervalId = setInterval(() => {
+      sendWs({ type: 'ping' });
+    }, 15000);
+
+    if (isInitialConnect) {
+      isInitialConnect = false;
+      fetchAppInfo();
+    } else {
+      // Reconnected! Re-attach all existing open tabs so they don't freeze
+      if (state.tabs.size > 0) {
+        console.log(`Re-attaching ${state.tabs.size} tabs to server PTYs...`);
+        const tabList = Array.from(state.tabs.values()).map(t => ({
+          tabId: t.id,
+          cwd: t.cwd,
+          cols: t.term ? t.term.cols : 80,
+          rows: t.term ? t.term.rows : 24
+        }));
+        sendWs({ type: 'attach', tabs: tabList });
+      }
+    }
   };
 
   state.ws.onmessage = (event) => {
     try {
       const msg = JSON.parse(event.data);
+
+      if (msg.type === 'ping') {
+        sendWs({ type: 'pong' });
+        return;
+      }
+
+      if (msg.type === 'pong') {
+        return;
+      }
 
       if (msg.type === 'data') {
         const tab = state.tabs.get(msg.tabId);
@@ -46,10 +94,10 @@ function initWebSocket() {
         }
       }
 
-      if (msg.type === 'created') {
+      if (msg.type === 'created' || msg.type === 'attached') {
         const tab = state.tabs.get(msg.tabId);
         if (tab) {
-          tab.cwd = msg.cwd;
+          if (msg.cwd) tab.cwd = msg.cwd;
           updateTabDisplay(tab);
           if (tab.id === state.activeTabId) {
             updateStatusBar();
@@ -66,8 +114,16 @@ function initWebSocket() {
   };
 
   state.ws.onclose = () => {
-    console.warn('Backend disconnected. Reconnecting in 2s...');
-    setTimeout(initWebSocket, 2000);
+    console.warn('Backend disconnected. Reconnecting in 1.5s...');
+    if (statusConn) {
+      statusConn.textContent = 'Reconnecting...';
+      statusConn.classList.add('disconnected');
+    }
+    if (pingIntervalId) {
+      clearInterval(pingIntervalId);
+      pingIntervalId = null;
+    }
+    setTimeout(initWebSocket, 1500);
   };
 }
 
@@ -106,6 +162,8 @@ function applyWorkspace(tabsToOpen) {
 // 3. Bind UI Event Listeners
 btnAddTab.addEventListener('click', () => createTab());
 btnOpenFolderTab.addEventListener('click', openInFolder);
+if (btnOpenScripts) btnOpenScripts.addEventListener('click', () => toggleScriptsModal());
+if (btnOpenVault) btnOpenVault.addEventListener('click', () => toggleVaultModal());
 btnToggleBroadcast.addEventListener('click', toggleBroadcast);
 btnToggleGrid.addEventListener('click', () => toggleGridLayout(switchTab));
 btnOpenHelp.addEventListener('click', () => toggleHelpModal());
@@ -163,5 +221,26 @@ window.addEventListener('resize', () => {
 
 window.addEventListener('beforeunload', autoSaveSession);
 
-// Bootstrap App
+// Auto-focus active terminal on window focus or viewport click
+const terminalViewportEl = document.getElementById('terminalViewport');
+if (terminalViewportEl) {
+  terminalViewportEl.addEventListener('click', () => {
+    const activeTab = state.tabs.get(state.activeTabId);
+    if (activeTab && activeTab.term) {
+      activeTab.term.focus();
+    }
+  });
+}
+
+window.addEventListener('focus', () => {
+  const activeTab = state.tabs.get(state.activeTabId);
+  if (activeTab && activeTab.term) {
+    activeTab.term.focus();
+  }
+});
+
+// Initialize Components & Bootstrap App
+initScriptsManager();
+initVaultManager();
+initSnapshotManager(createTab, switchTab);
 initWebSocket();
