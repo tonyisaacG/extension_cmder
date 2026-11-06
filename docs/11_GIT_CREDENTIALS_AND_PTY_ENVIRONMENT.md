@@ -132,17 +132,33 @@ set "GCM_GUI_PROMPT=0"
 set "GIT_TERMINAL_PROMPT=1"
 ```
 
-### 4.3 Git Host Username Binding (Zero-Prompt Direct Authentication)
-When a developer works predominantly with a specific account on GitHub, they can bind their username to the repository:
+## 4. Technical Resolution for Multi-Account Setups
 
+When multiple GitHub accounts are saved in Git Credential Manager on Windows (e.g. `tonyisaacG` and `tonyisaacAog`), Git doesn't know which account owns which repository unless specified.
+
+### Method 1: Bind the Account in the Repository (Recommended)
+Run inside the repository folder:
 ```bash
-# Per-Repository Binding (Preferred)
-git config credential.https://github.com.username <your-username>
-
-# Global Binding (All Repositories)
-git config --global credential.https://github.com.username <your-username>
+git config credential.username <your-github-account>
 ```
-With this configuration, GCM automatically queries Windows Credential Manager for the specified username without prompting.
+*Example for this repository:*
+```bash
+git config credential.username tonyisaacG
+```
+*Example for a work or portfolio repository:*
+```bash
+git config credential.username tonyisaacAog
+```
+
+### Method 2: Include the Username in the Remote URL
+```bash
+git remote set-url origin https://<username>@github.com/<owner>/<repo>.git
+```
+
+### Why This Fixes It:
+1. When Git connects to GitHub, it passes the specified `username` directly to Git Credential Manager.
+2. Git Credential Manager immediately retrieves the matching saved token from Windows Credential Manager.
+3. No popup window is triggered, no terminal prompt is needed, and `git push` / `git pull` executes immediately with zero delay.
 
 ---
 

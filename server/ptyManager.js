@@ -53,12 +53,7 @@ class PtyManager {
       CMDER_ROOT: this.cmderInfo ? this.cmderInfo.root : '',
       CMDER_CONTAINER_DIR: this.rootDir,
       PROMPT: '$P$G',
-      PATH: newPath,
-      // Force Git Credential Manager & Git to prompt via CLI / Terminal rather than
-      // spawning hidden Win32/WPF modal dialogs that get suppressed inside the PTY
-      GCM_MODAL_PROMPT: '0',
-      GCM_GUI_PROMPT: '0',
-      GIT_TERMINAL_PROMPT: '1'
+      PATH: newPath
     });
 
     const ptyProcess = pty.spawn(shell, args, {

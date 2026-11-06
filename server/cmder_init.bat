@@ -10,9 +10,3 @@ if defined CMDER_ROOT (
 
 :: Prepend container's bin/ (run_c, pass_c, val_c) and user_scripts/ to PATH
 set "PATH=%~dp0..\bin;%~dp0..\user_scripts;%PATH%"
-
-:: Ensure Git Credential Manager and Git interact via the terminal instead of
-:: spawning suppressed Win32/WPF modal dialogs in the pseudo-terminal
-set "GCM_MODAL_PROMPT=0"
-set "GCM_GUI_PROMPT=0"
-set "GIT_TERMINAL_PROMPT=1"
