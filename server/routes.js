@@ -456,6 +456,42 @@ function handleHttpRequest(req, res, { cmderInfo, rootDir, workspacesFile, lastS
     });
 
     delete requestHeaders['cookie'];
+    delete requestHeaders['accept-encoding']; // Avoid gzip/br so we can inject <base href> into HTML
+
+    // Special handler for ChatGPT: since Cloudflare and Next.js actively block third-party iframes
+    if (parsedTarget.hostname.includes('chatgpt.com') || parsedTarget.hostname.includes('openai.com')) {
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body { margin: 0; padding: 24px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #181818; color: #ececec; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 80vh; text-align: center; }
+            .card { background: #222; border: 1px solid #333; border-radius: 12px; padding: 28px; max-width: 420px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+            .badge { display: inline-block; background: #10a37f22; color: #10a37f; border: 1px solid #10a37f55; border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: bold; margin-bottom: 12px; }
+            h2 { margin: 0 0 10px 0; font-size: 20px; color: #fff; }
+            p { font-size: 13px; line-height: 1.5; color: #aaa; margin: 0 0 20px 0; }
+            .btn { display: inline-block; background: #10a37f; color: #fff; font-weight: bold; text-decoration: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; transition: background 0.2s; cursor: pointer; border: none; }
+            .btn:hover { background: #0e8c6d; }
+            .tip { margin-top: 16px; font-size: 11px; color: #666; }
+          </style>
+        </head>
+        <body>
+          <div class="card">
+            <span class="badge">🤖 ChatGPT Companion</span>
+            <h2>Official ChatGPT Session</h2>
+            <p>ChatGPT employs Cloudflare anti-bot verification and authentication cookies that require a direct browser window.</p>
+            <button class="btn" onclick="window.open('https://chatgpt.com', 'ChatGPT_Sidecar', 'width=540,height=880,left=' + (screen.width - 560) + ',top=0')">
+              👉 Open ChatGPT Companion Window ↗
+            </button>
+            <p class="tip">Opens in a dedicated side-by-side app window with your full account and chat history.</p>
+          </div>
+        </body>
+        </html>
+      `);
+      return;
+    }
 
     const proxyReq = client.request(parsedTarget, {
       method: req.method,
@@ -482,8 +518,27 @@ function handleHttpRequest(req, res, { cmderInfo, rootDir, workspacesFile, lastS
       responseHeaders['access-control-allow-origin'] = '*';
       responseHeaders['access-control-allow-methods'] = 'GET, POST, OPTIONS';
 
-      res.writeHead(proxyRes.statusCode || 200, responseHeaders);
-      proxyRes.pipe(res);
+      const contentType = responseHeaders['content-type'] || '';
+      if (contentType.includes('text/html')) {
+        let htmlBody = '';
+        proxyRes.setEncoding('utf-8');
+        proxyRes.on('data', chunk => htmlBody += chunk);
+        proxyRes.on('end', () => {
+          // Inject <base href> to resolve relative stylesheets, fonts, and scripts
+          const baseTag = `<base href="${parsedTarget.origin}/">`;
+          if (/<head[^>]*>/i.test(htmlBody)) {
+            htmlBody = htmlBody.replace(/<head[^>]*>/i, `$&${baseTag}`);
+          } else {
+            htmlBody = baseTag + htmlBody;
+          }
+          delete responseHeaders['content-length'];
+          res.writeHead(proxyRes.statusCode || 200, responseHeaders);
+          res.end(htmlBody);
+        });
+      } else {
+        res.writeHead(proxyRes.statusCode || 200, responseHeaders);
+        proxyRes.pipe(res);
+      }
     });
 
     proxyReq.on('error', (err) => {

@@ -131,13 +131,52 @@
           </div>
         </div>
 
+        <!-- Mode Switcher: AI Assistant vs Web Browser -->
+        <div class="copilot-mode-tabs">
+          <button class="copilot-mode-tab active" id="tabModeAi" data-mode="ai">🤖 AI Chat Assistant</button>
+          <button class="copilot-mode-tab" id="tabModeWeb" data-mode="web">🌐 Web & Docs</button>
+        </div>
+      </div>
+
+      <!-- VIEW 1: Native AI Chat Assistant -->
+      <div class="copilot-ai-view" id="copilotAiView">
+        <div class="copilot-chat-banner">
+          <span>Official ChatGPT Account?</span>
+          <button class="chat-banner-btn" id="btnOpenOfficialGpt">Open Companion Window ↗</button>
+        </div>
+
+        <div class="copilot-chat-messages" id="copilotChatMessages">
+          <div class="chat-msg chat-msg-system">
+            <div class="chat-msg-avatar">🤖</div>
+            <div class="chat-msg-body">
+              <p><b>Hello! I am your embedded Cmder AI Assistant.</b></p>
+              <p>Ask me how to run commands, fix git issues, write PowerShell scripts, or debug your terminal. Any code block I generate can be executed in your terminal with 1 click!</p>
+              <div class="chat-quick-chips">
+                <button class="quick-chip" data-prompt="How do I undo my last git commit but keep changes?">Undo last git commit</button>
+                <button class="quick-chip" data-prompt="Show me how to find and kill a process on port 3000 in Windows">Kill port 3000</button>
+                <button class="quick-chip" data-prompt="Write a powershell command to search files containing a string">Search text in files</button>
+                <button class="quick-chip" data-prompt="How do I use pass_c to save and paste passwords in Cmder?">Use pass_c vault</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="copilot-chat-input-bar">
+          <input type="text" class="chat-input-field" id="copilotChatInput" placeholder="Ask AI a question or prompt (Enter to send)..." autocomplete="off">
+          <button class="chat-send-btn" id="copilotChatSend" title="Send Question">Send</button>
+        </div>
+      </div>
+
+      <!-- VIEW 2: Embedded Web Browser & Documentation -->
+      <div class="copilot-web-view hidden" id="copilotWebView">
         <!-- Preset Bookmarks Bar -->
         <div class="copilot-presets" id="copilotPresets">
-          <button class="preset-pill active" data-url="https://chatgpt.com">🤖 ChatGPT</button>
-          <button class="preset-pill" data-url="https://www.google.com">🔍 Google</button>
-          <button class="preset-pill" data-url="https://devdocs.io">📚 DevDocs</button>
+          <button class="preset-pill active" data-url="https://devdocs.io">📚 DevDocs</button>
+          <button class="preset-pill" data-url="https://duckduckgo.com">🔍 DuckDuckGo</button>
           <button class="preset-pill" data-url="https://github.com">🐙 GitHub</button>
-          <button class="preset-pill" data-url="http://localhost:3000">💻 Localhost</button>
+          <button class="preset-pill" data-url="http://localhost:3000">💻 Localhost:3000</button>
+          <button class="preset-pill" data-url="http://localhost:8080">💻 Localhost:8080</button>
+          <button class="preset-pill" data-url="https://chatgpt.com">🤖 ChatGPT</button>
         </div>
 
         <!-- Browser Navigation Bar -->
@@ -146,19 +185,19 @@
           <button class="copilot-nav-btn" id="copilotBtnForward" title="Forward">▶</button>
           <button class="copilot-nav-btn" id="copilotBtnReload" title="Reload Page">🔄</button>
           <div class="copilot-input-wrapper">
-            <input type="text" class="copilot-url-input" id="copilotUrlInput" placeholder="Search or enter URL (e.g. chatgpt.com)..." autocomplete="off" spellcheck="false">
+            <input type="text" class="copilot-url-input" id="copilotUrlInput" placeholder="Search or enter URL (e.g. devdocs.io)..." autocomplete="off" spellcheck="false">
           </div>
           <button class="copilot-go-btn" id="copilotBtnGo">Go</button>
         </div>
-      </div>
 
-      <!-- Iframe Web Container -->
-      <div class="copilot-webview-container" id="copilotWebviewContainer">
-        <div class="copilot-loader hidden" id="copilotLoader">
-          <div class="copilot-spinner"></div>
-          <span>Loading page...</span>
+        <!-- Iframe Web Container -->
+        <div class="copilot-webview-container" id="copilotWebviewContainer">
+          <div class="copilot-loader hidden" id="copilotLoader">
+            <div class="copilot-spinner"></div>
+            <span>Loading page...</span>
+          </div>
+          <iframe class="copilot-iframe" id="copilotIframe" sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals" src="about:blank"></iframe>
         </div>
-        <iframe class="copilot-iframe" id="copilotIframe" sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals" src="about:blank"></iframe>
       </div>
 
       <!-- Quick Command Injection Footer -->
