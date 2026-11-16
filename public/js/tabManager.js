@@ -129,18 +129,10 @@ export function createBrowserTab(initialUrl = 'https://devdocs.io', title = 'Bro
         <button class="browser-tab-btn" data-action="forward" title="Forward">▶</button>
         <button class="browser-tab-btn" data-action="reload" title="Reload">🔄</button>
         <div class="browser-tab-input-wrapper">
-          <input type="text" class="browser-tab-url-input" value="${initialUrl}" placeholder="Enter URL or search..." spellcheck="false" autocomplete="off">
+          <input type="text" class="browser-tab-url-input" value="${initialUrl}" placeholder="Enter any URL or search (e.g. google.com, devdocs.io, localhost:3000)..." spellcheck="false" autocomplete="off">
         </div>
         <button class="browser-tab-go-btn" data-action="go">Go</button>
         <button class="browser-tab-popout-btn" data-action="popout" title="Open in External Browser ↗">↗</button>
-      </div>
-      <div class="browser-tab-presets-row">
-        <button class="preset-pill active" data-url="https://devdocs.io">📚 DevDocs</button>
-        <button class="preset-pill" data-url="https://duckduckgo.com">🔍 DuckDuckGo</button>
-        <button class="preset-pill" data-url="https://github.com">🐙 GitHub</button>
-        <button class="preset-pill" data-url="http://localhost:3000">💻 Localhost:3000</button>
-        <button class="preset-pill" data-url="http://localhost:8080">💻 Localhost:8080</button>
-        <button class="preset-pill" data-url="https://chatgpt.com">🤖 ChatGPT</button>
       </div>
     </div>
     <div class="browser-tab-content">
@@ -182,9 +174,7 @@ export function createBrowserTab(initialUrl = 'https://devdocs.io', title = 'Bro
   const navigateTo = (rawTarget, addToHistory = true) => {
     if (!rawTarget) return;
     let target = rawTarget.trim();
-    if (target.includes('chatgpt.com') || target.includes('openai.com')) {
-      target = 'https://chatgpt.com';
-    } else if (!/^https?:\/\//i.test(target)) {
+    if (!/^https?:\/\//i.test(target)) {
       if (target.includes(' ') || !target.includes('.')) {
         target = `https://duckduckgo.com/?q=${encodeURIComponent(target)}`;
       } else {
@@ -201,15 +191,6 @@ export function createBrowserTab(initialUrl = 'https://devdocs.io', title = 'Bro
       navHistory.push(target);
       historyIdx = navHistory.length - 1;
     }
-
-    // Update preset pills
-    paneEl.querySelectorAll('.preset-pill').forEach(pill => {
-      if (pill.dataset.url && target.startsWith(pill.dataset.url)) {
-        pill.classList.add('active');
-      } else {
-        pill.classList.remove('active');
-      }
-    });
   };
 
   paneEl.addEventListener('click', (e) => {
@@ -238,8 +219,6 @@ export function createBrowserTab(initialUrl = 'https://devdocs.io', title = 'Bro
       document.body.appendChild(a);
       a.click();
       a.remove();
-    } else if (btn.classList.contains('preset-pill') && btn.dataset.url) {
-      navigateTo(btn.dataset.url, true);
     }
   });
 

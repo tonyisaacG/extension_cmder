@@ -62,9 +62,9 @@
           <span class="tool-icon">📸</span>
           <span class="tool-label">Snapshots</span>
         </button>
-        <button class="tool-btn" id="btnToggleCopilot" title="Toggle AI Copilot & Web Panel (Alt+C)">
-          <span class="tool-icon">🤖</span>
-          <span class="tool-label">Copilot</span>
+        <button class="tool-btn" id="btnToggleCopilot" title="Toggle Split Web Browser (Alt+C)">
+          <span class="tool-icon">🌐</span>
+          <span class="tool-label">Browser</span>
         </button>
         <!-- Workspaces Menu -->
         <div class="dropdown">
@@ -118,68 +118,20 @@
     </main>
 
     <!-- Resizable Drag Separator -->
-    <div class="copilot-resizer hidden" id="copilotResizer" title="Drag to resize Copilot split panel"></div>
+    <div class="copilot-resizer hidden" id="copilotResizer" title="Drag to resize Browser split panel"></div>
 
-    <!-- AI Copilot & Web Companion Panel (Right) -->
+    <!-- Web Browser Split Panel (Right) -->
     <aside class="copilot-panel hidden" id="copilotPanel">
       <div class="copilot-header">
         <div class="copilot-top-row">
           <div class="copilot-brand">
-            <span class="copilot-icon">🤖</span>
-            <span class="copilot-title">AI Copilot & Web</span>
+            <span class="copilot-icon">🌐</span>
+            <span class="copilot-title">Web Browser</span>
           </div>
           <div class="copilot-header-actions">
-            <button class="copilot-action-btn" id="copilotBtnPopout" title="Open in External Browser ↗">↗</button>
-            <button class="copilot-action-btn copilot-close-btn" id="copilotBtnClose" title="Close Panel (Alt+C or Esc)">✕</button>
+            <button class="copilot-action-btn" id="copilotBtnPopout" title="Open in External Browser (↗)">↗</button>
+            <button class="copilot-action-btn copilot-close-btn" id="copilotBtnClose" title="Close Browser Panel (Alt+C or Esc)">✕</button>
           </div>
-        </div>
-
-        <!-- Mode Switcher: AI Assistant vs Web Browser -->
-        <div class="copilot-mode-tabs">
-          <button class="copilot-mode-tab active" id="tabModeAi" data-mode="ai">🤖 AI Chat Assistant</button>
-          <button class="copilot-mode-tab" id="tabModeWeb" data-mode="web">🌐 Web & Docs</button>
-        </div>
-      </div>
-
-      <!-- VIEW 1: Native AI Chat Assistant -->
-      <div class="copilot-ai-view" id="copilotAiView">
-        <div class="copilot-chat-banner">
-          <span>Official ChatGPT Account?</span>
-          <button class="chat-banner-btn" id="btnOpenOfficialGpt">Open Companion Window ↗</button>
-        </div>
-
-        <div class="copilot-chat-messages" id="copilotChatMessages">
-          <div class="chat-msg chat-msg-system">
-            <div class="chat-msg-avatar">🤖</div>
-            <div class="chat-msg-body">
-              <p><b>Hello! I am your embedded Cmder AI Assistant.</b></p>
-              <p>Ask me how to run commands, fix git issues, write PowerShell scripts, or debug your terminal. Any code block I generate can be executed in your terminal with 1 click!</p>
-              <div class="chat-quick-chips">
-                <button class="quick-chip" data-prompt="How do I undo my last git commit but keep changes?">Undo last git commit</button>
-                <button class="quick-chip" data-prompt="Show me how to find and kill a process on port 3000 in Windows">Kill port 3000</button>
-                <button class="quick-chip" data-prompt="Write a powershell command to search files containing a string">Search text in files</button>
-                <button class="quick-chip" data-prompt="How do I use pass_c to save and paste passwords in Cmder?">Use pass_c vault</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="copilot-chat-input-bar">
-          <input type="text" class="chat-input-field" id="copilotChatInput" placeholder="Ask AI a question or prompt (Enter to send)..." autocomplete="off">
-          <button class="chat-send-btn" id="copilotChatSend" title="Send Question">Send</button>
-        </div>
-      </div>
-
-      <!-- VIEW 2: Embedded Web Browser & Documentation -->
-      <div class="copilot-web-view hidden" id="copilotWebView">
-        <!-- Preset Bookmarks Bar -->
-        <div class="copilot-presets" id="copilotPresets">
-          <button class="preset-pill active" data-url="https://devdocs.io">📚 DevDocs</button>
-          <button class="preset-pill" data-url="https://duckduckgo.com">🔍 DuckDuckGo</button>
-          <button class="preset-pill" data-url="https://github.com">🐙 GitHub</button>
-          <button class="preset-pill" data-url="http://localhost:3000">💻 Localhost:3000</button>
-          <button class="preset-pill" data-url="http://localhost:8080">💻 Localhost:8080</button>
-          <button class="preset-pill" data-url="https://chatgpt.com">🤖 ChatGPT</button>
         </div>
 
         <!-- Browser Navigation Bar -->
@@ -188,19 +140,19 @@
           <button class="copilot-nav-btn" id="copilotBtnForward" title="Forward">▶</button>
           <button class="copilot-nav-btn" id="copilotBtnReload" title="Reload Page">🔄</button>
           <div class="copilot-input-wrapper">
-            <input type="text" class="copilot-url-input" id="copilotUrlInput" placeholder="Search or enter URL (e.g. devdocs.io)..." autocomplete="off" spellcheck="false">
+            <input type="text" class="copilot-url-input" id="copilotUrlInput" value="https://devdocs.io" placeholder="Enter URL or search (e.g. google.com, localhost:3000)..." autocomplete="off" spellcheck="false">
           </div>
           <button class="copilot-go-btn" id="copilotBtnGo">Go</button>
         </div>
+      </div>
 
-        <!-- Iframe Web Container -->
-        <div class="copilot-webview-container" id="copilotWebviewContainer">
-          <div class="copilot-loader hidden" id="copilotLoader">
-            <div class="copilot-spinner"></div>
-            <span>Loading page...</span>
-          </div>
-          <iframe class="copilot-iframe" id="copilotIframe" sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals" src="about:blank"></iframe>
+      <!-- Iframe Web Container -->
+      <div class="copilot-webview-container" id="copilotWebviewContainer">
+        <div class="copilot-loader hidden" id="copilotLoader">
+          <div class="copilot-spinner"></div>
+          <span>Loading page...</span>
         </div>
+        <iframe class="copilot-iframe" id="copilotIframe" sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals" src="about:blank"></iframe>
       </div>
 
       <!-- Quick Command Injection Footer -->
@@ -220,8 +172,8 @@
       <span class="status-pill conn-status" id="statusConn">Online</span>
     </div>
     <div class="status-right">
-      <button class="status-btn" id="statusCopilotTrigger" title="Toggle AI Copilot Panel (Alt+C)">
-        <kbd>Alt+C</kbd> Copilot
+      <button class="status-btn" id="statusCopilotTrigger" title="Toggle Split Web Browser (Alt+C)">
+        <kbd>Alt+C</kbd> Browser
       </button>
       <button class="status-btn" id="statusHelpTrigger" title="View Keyboard Shortcuts & Guide (Alt+H or F1)">
         <kbd>Alt+H</kbd> Shortcuts & Guide
