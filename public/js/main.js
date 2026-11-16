@@ -11,6 +11,7 @@ import { autoSaveSession, restoreLastSession, saveCurrentWorkspace, loadWorkspac
 import { initScriptsManager, toggleScriptsModal } from './scriptsManager.js';
 import { initVaultManager, toggleVaultModal } from './vaultManager.js';
 import { initSnapshotManager } from './snapshotManager.js';
+import { initCopilotManager } from './copilotManager.js';
 
 // DOM Controls
 const btnAddTab = document.getElementById('btnAddTab');
@@ -243,4 +244,5 @@ window.addEventListener('focus', () => {
 initScriptsManager();
 initVaultManager();
 initSnapshotManager(createTab, switchTab);
+initCopilotManager();
 initWebSocket();

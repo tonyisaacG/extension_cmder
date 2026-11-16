@@ -56,6 +56,15 @@ Build a **blazing fast, lightweight, resilient terminal container** for Windows 
 - [x] **Terminal Fallback Prompting:** Injected `GIT_TERMINAL_PROMPT=1` for standard Git credential queries.
 - [x] **Host Username Binding:** Bound repository credentials (`credential.https://github.com.username`) for seamless non-interactive Git operations.
 
+### Phase 7: Embedded AI Copilot & Web Split-Panel Engine (Completed)
+- [x] **Split-Panel DOM & Resizer:** Expandable secondary container with drag-to-resize divider on the right side of the container.
+- [x] **Streaming Reverse Proxy (`/api/proxy`):** Strips `X-Frame-Options` and CSP frame-ancestors headers to allow embedded live browsing.
+- [x] **Copilot Manager Module (`copilotManager.js`):** URL input, navigation controls, quick preset pills (ChatGPT, DevDocs, Google, GitHub, Localhost).
+- [x] **1-Click Shell Injection:** Paste or run code blocks directly into the active Cmder terminal tab.
+- [x] **Terminal Canvas Fit:** Automatically calls `fitAddon.fit()` during panel slide and drag-resizing.
+- [x] **Keyboard Dispatcher:** Binds `Alt + C` for instant toggle.
+- [x] **Snapshots & Memory Sync:** Records active Copilot URL and state into session snapshots.
+
 ---
 
 ## 3. Maintenance & Extension Guidelines

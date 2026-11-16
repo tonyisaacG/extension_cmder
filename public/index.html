@@ -59,6 +59,10 @@
           <span class="tool-icon">📸</span>
           <span class="tool-label">Snapshots</span>
         </button>
+        <button class="tool-btn" id="btnToggleCopilot" title="Toggle AI Copilot & Web Panel (Alt+C)">
+          <span class="tool-icon">🤖</span>
+          <span class="tool-label">Copilot</span>
+        </button>
         <!-- Workspaces Menu -->
         <div class="dropdown">
           <button class="tool-btn dropdown-toggle" id="btnWorkspaces" title="Workspaces Management">
@@ -103,10 +107,68 @@
     </div>
   </div>
 
-  <!-- Terminal View Area -->
-  <main class="terminal-viewport" id="terminalViewport">
-    <!-- Tab terminal containers will be injected here -->
-  </main>
+  <!-- Main Workspace Layout (Terminal Viewport on Left + Collapsible Copilot Panel on Right) -->
+  <div class="workspace-layout" id="workspaceLayout">
+    <!-- Terminal View Area -->
+    <main class="terminal-viewport" id="terminalViewport">
+      <!-- Tab terminal containers will be injected here -->
+    </main>
+
+    <!-- Resizable Drag Separator -->
+    <div class="copilot-resizer hidden" id="copilotResizer" title="Drag to resize Copilot split panel"></div>
+
+    <!-- AI Copilot & Web Companion Panel (Right) -->
+    <aside class="copilot-panel hidden" id="copilotPanel">
+      <div class="copilot-header">
+        <div class="copilot-top-row">
+          <div class="copilot-brand">
+            <span class="copilot-icon">🤖</span>
+            <span class="copilot-title">AI Copilot & Web</span>
+          </div>
+          <div class="copilot-header-actions">
+            <button class="copilot-action-btn" id="copilotBtnPopout" title="Open in External Browser ↗">↗</button>
+            <button class="copilot-action-btn copilot-close-btn" id="copilotBtnClose" title="Close Panel (Alt+C or Esc)">✕</button>
+          </div>
+        </div>
+
+        <!-- Preset Bookmarks Bar -->
+        <div class="copilot-presets" id="copilotPresets">
+          <button class="preset-pill active" data-url="https://chatgpt.com">🤖 ChatGPT</button>
+          <button class="preset-pill" data-url="https://www.google.com">🔍 Google</button>
+          <button class="preset-pill" data-url="https://devdocs.io">📚 DevDocs</button>
+          <button class="preset-pill" data-url="https://github.com">🐙 GitHub</button>
+          <button class="preset-pill" data-url="http://localhost:3000">💻 Localhost</button>
+        </div>
+
+        <!-- Browser Navigation Bar -->
+        <div class="copilot-nav-bar">
+          <button class="copilot-nav-btn" id="copilotBtnBack" title="Back">◀</button>
+          <button class="copilot-nav-btn" id="copilotBtnForward" title="Forward">▶</button>
+          <button class="copilot-nav-btn" id="copilotBtnReload" title="Reload Page">🔄</button>
+          <div class="copilot-input-wrapper">
+            <input type="text" class="copilot-url-input" id="copilotUrlInput" placeholder="Search or enter URL (e.g. chatgpt.com)..." autocomplete="off" spellcheck="false">
+          </div>
+          <button class="copilot-go-btn" id="copilotBtnGo">Go</button>
+        </div>
+      </div>
+
+      <!-- Iframe Web Container -->
+      <div class="copilot-webview-container" id="copilotWebviewContainer">
+        <div class="copilot-loader hidden" id="copilotLoader">
+          <div class="copilot-spinner"></div>
+          <span>Loading page...</span>
+        </div>
+        <iframe class="copilot-iframe" id="copilotIframe" sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals" src="about:blank"></iframe>
+      </div>
+
+      <!-- Quick Command Injection Footer -->
+      <div class="copilot-quick-footer">
+        <span class="quick-footer-icon" title="Quick Shell Injection">⚡</span>
+        <input type="text" class="quick-inject-input" id="copilotInjectInput" placeholder="Paste command to run in active Cmder tab..." autocomplete="off">
+        <button class="quick-inject-btn" id="copilotBtnInject" title="Run in Active Cmder Tab">▶ Run</button>
+      </div>
+    </aside>
+  </div>
 
   <!-- Status Bar / Uncluttered Footer -->
   <footer class="app-statusbar">
@@ -116,6 +178,9 @@
       <span class="status-pill conn-status" id="statusConn">Online</span>
     </div>
     <div class="status-right">
+      <button class="status-btn" id="statusCopilotTrigger" title="Toggle AI Copilot Panel (Alt+C)">
+        <kbd>Alt+C</kbd> Copilot
+      </button>
       <button class="status-btn" id="statusHelpTrigger" title="View Keyboard Shortcuts & Guide (Alt+H or F1)">
         <kbd>Alt+H</kbd> Shortcuts & Guide
       </button>
@@ -368,6 +433,11 @@
                 <td><kbd>Alt</kbd> + <kbd>V</kbd></td>
                 <td><b>Vault Store</b></td>
                 <td>Opens Secrets & Notes Vault to paste passwords with 1-click</td>
+              </tr>
+              <tr>
+                <td><kbd>Alt</kbd> + <kbd>C</kbd></td>
+                <td><b>AI Copilot & Web</b></td>
+                <td>Toggles the side-by-side AI Copilot and Web Browser split-panel</td>
               </tr>
               <tr>
                 <td><kbd>Alt</kbd> + <kbd>W</kbd></td>

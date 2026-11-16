@@ -3,6 +3,7 @@ import { toggleBroadcast } from './broadcast.js';
 import { isScriptsModalOpen, toggleScriptsModal } from './scriptsManager.js';
 import { isVaultModalOpen, toggleVaultModal } from './vaultManager.js';
 import { isSnapshotsModalOpen, toggleSnapshotsModal, clearActiveSession } from './snapshotManager.js';
+import { isCopilotOpen, toggleCopilotPanel } from './copilotManager.js';
 
 // Throttle timestamps to prevent double-firing and key repeats
 let lastCreateTime = 0;
@@ -60,6 +61,11 @@ export function handleAppShortcut(e, { createTab, closeTab, switchTab, navigateT
       toggleHelpModal(false);
       return false;
     }
+    if (isCopilotOpen()) {
+      markHandled();
+      toggleCopilotPanel(false);
+      return false;
+    }
     const broadcastBar = document.getElementById('broadcastBar');
     if (broadcastBar && !broadcastBar.classList.contains('hidden')) {
       markHandled();
@@ -105,6 +111,14 @@ export function handleAppShortcut(e, { createTab, closeTab, switchTab, navigateT
     if (e.repeat) return false;
     markHandled();
     toggleScriptsModal();
+    return false;
+  }
+
+  // 4b. AI Copilot & Web Split-Panel: Alt+C
+  if (e.altKey && e.key.toLowerCase() === 'c') {
+    if (e.repeat) return false;
+    markHandled();
+    toggleCopilotPanel();
     return false;
   }
 

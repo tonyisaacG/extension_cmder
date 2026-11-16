@@ -39,3 +39,13 @@
     - Added in-terminal interactive account selection menu so users can pick between multiple accounts directly in the tab.
     - Injected `GIT_TERMINAL_PROMPT=1` ensuring fallback Git credential prompts render directly into xterm.js without hanging.
     - Bound `credential.https://github.com.username tonyisaacG` for zero-friction, instant remote pushing/pulling.
+
+
+[x] Embedded AI Copilot & Web Split-Panel Engine (Completed)
+    - Specification: docs/12_EMBEDDED_AI_COPILOT_AND_WEB_PANEL.md
+    - Architecture: Resizable, collapsible split-panel on the right side of the container (triggered by Alt+C or header button).
+    - Persistent Session: Remains open while switching between terminal tabs without reloading.
+    - Iframe CORS Proxy: Backend endpoint (/api/proxy) stripping X-Frame-Options to allow embedding of ChatGPT, DevDocs, Google, and documentation.
+    - Presets & Quick Bookmarks: 1-click pills for ChatGPT, Google Dev, DevDocs.io, GitHub, and Localhost.
+    - 1-Click Code Injection: Execute code snippets directly into the active Cmder terminal tab.
+    - Snapshot & Workspace Integration: Automatically records Copilot visibility and URL in session snapshots. 

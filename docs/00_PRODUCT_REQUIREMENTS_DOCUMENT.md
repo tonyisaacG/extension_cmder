@@ -51,6 +51,7 @@ Windows developers managing microservices, cloud deployments, and multi-repo arc
 | **FR-10** | Native Desktop Window & Shortcut | Launch as a borderless, dedicated desktop app using Chrome/Edge application mode. | `custome_cmder.bat`, `create_shortcut.bat` |
 | **FR-11** | Session Snapshots & Buffer Re-execution | Capture full scrollback buffer, command history & output; restore to continue live. | `Alt+M`, `Alt+K`, Header `📸 Snapshots` |
 | **FR-12** | Git & Credential Manager Interactive Engine | Visible GitHub account selection & credentials prompt directly in terminal without hidden modal suppression. | Terminal PTY Environment (`GCM_GUI_PROMPT=0`) |
+| **FR-13** | Embedded AI Copilot & Web Split-Panel | Docked, resizable secondary web & AI workspace (ChatGPT, Docs, Search) with CORS proxy and 1-click shell injection. | `Alt+C`, Header `🤖 Copilot` |
 
 ---
 
@@ -144,6 +145,15 @@ Windows developers managing microservices, cloud deployments, and multi-repo arc
   * Redirects Git Credential Manager (GCM) from hidden Win32/WPF modal popups (which are suppressed by `SW_HIDE` in background/winpty processes) into clean, visible terminal choice menus.
   * Injects `GIT_TERMINAL_PROMPT=1` ensuring standard Git authentication queries fallback cleanly to the active terminal tab.
   * Supports repository-level username binding (`git config credential.https://github.com.username <username>`) for zero-prompt instant authentication.
+
+### 4.11 FR-13: Embedded AI Copilot & Web Split-Panel Engine
+* **Requirement:** Provide developers with an embedded, persistent web and AI companion panel on the right side of the container, eliminating window switching during debugging.
+* **Mechanism:**
+  * Docked, resizable split panel with draggable separator (`.copilot-resizer`).
+  * Backend streaming proxy (`/api/proxy?url=<target>`) stripping `X-Frame-Options` and `Content-Security-Policy` to enable live web embedding.
+  * Instant 1-click command execution to active terminal PTY stream.
+  * Quick-launch presets: ChatGPT, Google Dev, DevDocs.io, GitHub, and Localhost.
+  * Persistence across workspace reboots and session snapshots.
 
 ---
 

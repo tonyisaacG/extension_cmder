@@ -1,5 +1,7 @@
 const fs = require('fs');
 const path = require('path');
+const http = require('http');
+const https = require('https');
 const { exec } = require('child_process');
 
 const MIME_TYPES = {
@@ -421,6 +423,86 @@ function handleHttpRequest(req, res, { cmderInfo, rootDir, workspacesFile, lastS
       }
       return;
     }
+  }
+
+  // 7. Streaming Web & AI Proxy (strips X-Frame-Options and CSP for embedded Copilot)
+  if (pathname === '/api/proxy') {
+    const rawTarget = parsedUrl.searchParams.get('url');
+    if (!rawTarget) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Missing target URL' }));
+      return;
+    }
+
+    let parsedTarget;
+    try {
+      let u = rawTarget.trim();
+      if (!/^https?:\/\//i.test(u)) {
+        u = 'https://' + u;
+      }
+      parsedTarget = new URL(u);
+    } catch (e) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Invalid target URL: ' + e.message }));
+      return;
+    }
+
+    const client = parsedTarget.protocol === 'https:' ? https : http;
+    const requestHeaders = Object.assign({}, req.headers, {
+      host: parsedTarget.host,
+      origin: parsedTarget.origin,
+      referer: parsedTarget.origin,
+      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    });
+
+    delete requestHeaders['cookie'];
+
+    const proxyReq = client.request(parsedTarget, {
+      method: req.method,
+      headers: requestHeaders
+    }, (proxyRes) => {
+      // Handle redirects smoothly
+      if ([301, 302, 303, 307, 308].includes(proxyRes.statusCode) && proxyRes.headers.location) {
+        let redirectUrl = proxyRes.headers.location;
+        try {
+          redirectUrl = new URL(redirectUrl, parsedTarget).href;
+        } catch (_) {}
+        res.writeHead(302, { 'Location': `/api/proxy?url=${encodeURIComponent(redirectUrl)}` });
+        res.end();
+        return;
+      }
+
+      // Clone headers and strip anti-iframe / CSP constraints
+      const responseHeaders = Object.assign({}, proxyRes.headers);
+      delete responseHeaders['x-frame-options'];
+      delete responseHeaders['content-security-policy'];
+      delete responseHeaders['content-security-policy-report-only'];
+      delete responseHeaders['frame-options'];
+
+      responseHeaders['access-control-allow-origin'] = '*';
+      responseHeaders['access-control-allow-methods'] = 'GET, POST, OPTIONS';
+
+      res.writeHead(proxyRes.statusCode || 200, responseHeaders);
+      proxyRes.pipe(res);
+    });
+
+    proxyReq.on('error', (err) => {
+      res.writeHead(502, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(`
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #181818; color: #eee; padding: 32px; text-align: center; border-radius: 8px; margin: 20px;">
+          <h3 style="color: #e74c3c; margin-bottom: 8px;">⚠️ Connection Failed</h3>
+          <p style="color: #aaa; margin-bottom: 16px;">Could not connect to <code style="background: #252525; padding: 2px 6px; border-radius: 4px; color: #2ecc71;">${rawTarget}</code>: ${err.message}</p>
+          <a href="${rawTarget}" target="_blank" style="display: inline-block; padding: 8px 16px; background: #2ecc71; color: #111; text-decoration: none; border-radius: 4px; font-weight: bold;">Open in New Browser Window ↗</a>
+        </div>
+      `);
+    });
+
+    if (req.method === 'POST') {
+      req.pipe(proxyReq);
+    } else {
+      proxyReq.end();
+    }
+    return;
   }
 
   // 8. Vendor xterm libraries

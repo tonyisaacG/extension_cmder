@@ -70,6 +70,7 @@ Then open `http://localhost:5321` in your browser.
 | **`Alt + K`** | **Clear Terminal** | Clears terminal screen and scrollback buffer (`cls`) |
 | **`Alt + B`** | **Broadcast** | Toggles multi-tab command broadcast bar |
 | **`Alt + G`** | **Grid Mode** | Toggles dynamic split-screen CSS Grid view |
+| **`Alt + C`** | **AI Copilot** | Toggles embedded AI & web reference split-panel |
 | **`Alt + H`** *(or `F1`)* | **Help Guide** | Opens full guide & shortcuts cheat sheet |
 | **`Escape`** | **Close Modal** | Closes any open modal or broadcast bar |
 
@@ -111,6 +112,7 @@ extension_cmder/
 │   ├── 09_RELIABILITY_HEARTBEAT_AND_DESKTOP_INTEGRATION.md
 │   ├── 10_SESSION_SNAPSHOTS_AND_MEMORY.md
 │   ├── 11_GIT_CREDENTIALS_AND_PTY_ENVIRONMENT.md
+│   ├── 12_EMBEDDED_AI_COPILOT_AND_WEB_PANEL.md
 │   └── FEATURE_AND_BUG_TRACKER.md# Master feature & bug registry
 ├── public/                       # Frontend Zero-Build ES6 Web Application
 │   ├── js/

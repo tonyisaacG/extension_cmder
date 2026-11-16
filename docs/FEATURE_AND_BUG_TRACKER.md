@@ -11,7 +11,7 @@
 
 | Metric | Count | Status |
 | :--- | :--- | :--- |
-| **Total Features Implemented** | 11 Core Features | 🟢 100% Complete & Active |
+| **Total Features Implemented** | 12 Features Fully Implemented | 🟢 Complete |
 | **Bugs Identified & Resolved** | 6 Defects Resolved | 🟢 0 Open / 6 Resolved |
 | **Persistence Stores** | 5 Local JSON Stores | `last_session.json`, `workspaces.json`, `scripts.json`, `vault.json`, `snapshots.json` |
 | **CLI Utilities** | 3 System Commands | `run_c`, `pass_c`, `val_c` |
@@ -99,6 +99,13 @@
 * **Responsible Modules:** [`custome_cmder.bat`](file:///e:/2026/MyBigProjects_SimpleLib/extension_cmder/custome_cmder.bat), [`create_shortcut.bat`](file:///e:/2026/MyBigProjects_SimpleLib/extension_cmder/create_shortcut.bat).
 * **Status:** 🟢 Complete.
 
+### [FEAT-12] Embedded AI Copilot & Web Split-Panel Engine
+* **Description:** Collapsible, resizable secondary workspace on the right side of the container running alongside active terminal tabs. Features streaming CORS proxy, quick-access presets (ChatGPT, Google, DevDocs, Localhost), and 1-click command injection to terminal.
+* **UI Trigger:** Header `🤖 Copilot` button, `Alt + C`.
+* **Backend Endpoint:** `GET /api/proxy?url=<url>`.
+* **Responsible Modules:** [`public/js/copilotManager.js`](file:///e:/2026/MyBigProjects_SimpleLib/extension_cmder/public/js/copilotManager.js), [`server/routes.js`](file:///e:/2026/MyBigProjects_SimpleLib/extension_cmder/server/routes.js), [`public/js/shortcuts.js`](file:///e:/2026/MyBigProjects_SimpleLib/extension_cmder/public/js/shortcuts.js).
+* **Status:** 🟢 Complete.
+
 ---
 
 ## 3. Bug Registry & Resolution Log
@@ -130,7 +137,8 @@
 | Alt + K     : Clear Screen/Buffer  | Ctrl + E : ASCII 05 (Line end)     |
 | Alt + B     : Broadcast Bar        | Ctrl + L : ASCII 12 (Clear screen) |
 | Alt + G     : Grid View Toggle     | Ctrl + U : ASCII 21 (Delete line)  |
-| Alt + 1..9  : Direct Jump to Tab   | Ctrl + V : Safe Clipboard Paste    |
+| Alt + C     : AI Copilot Panel     | Ctrl + V : Safe Clipboard Paste    |
+| Alt + 1..9  : Direct Jump to Tab   | Ctrl + D : ASCII 04 (EOF / Exit)   |
 | Alt + Left  : Move Tab Backward    | Ctrl + D : ASCII 04 (EOF / Exit)   |
 | Alt + Right : Move Tab Forward     | Ctrl + Z : ASCII 26 (Suspend/EOF)  |
 | Alt + H / F1: Guide & Cheat Sheet  | Ctrl + Shift + I : DevTools        |

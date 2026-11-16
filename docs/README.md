@@ -91,6 +91,14 @@ Welcome to the comprehensive product and engineering documentation for the **Cmd
   * Solution: Injecting `GCM_MODAL_PROMPT=0` and `GCM_GUI_PROMPT=0` forcing clean in-terminal account selection.
   * Terminal fallback: `GIT_TERMINAL_PROMPT=1` and repository username binding.
 
+* [**12. Embedded AI Copilot & Web Split-Panel Engine**](./12_EMBEDDED_AI_COPILOT_AND_WEB_PANEL.md)
+  * Resizable, collapsible secondary web & AI workspace docked on the right side of the container.
+  * Persistent session: stays active and open while switching between terminal tabs without reloading.
+  * Backend streaming proxy (`/api/proxy`) stripping `X-Frame-Options` and CSP frame-ancestors.
+  * 1-Click code snippet injection directly into the active Cmder shell.
+  * Quick-launch pills: `ChatGPT`, `Google Dev`, `DevDocs.io`, `GitHub`, and `Localhost`.
+  * Keyboard shortcut: `Alt + C` toggle with automatic xterm dynamic canvas re-fit.
+
 ---
 
 ## 🛠️ Technology Stack Summary
