@@ -68,7 +68,7 @@ function handleHttpRequest(req, res, { cmderInfo, rootDir, workspacesFile, lastS
       if (fs.existsSync(lastSessionFile)) {
         try {
           data = JSON.parse(fs.readFileSync(lastSessionFile, 'utf-8'));
-        } catch (_) {}
+        } catch (_) { }
       }
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(data));
@@ -97,7 +97,7 @@ function handleHttpRequest(req, res, { cmderInfo, rootDir, workspacesFile, lastS
       if (fs.existsSync(workspacesFile)) {
         try {
           data = JSON.parse(fs.readFileSync(workspacesFile, 'utf-8'));
-        } catch (_) {}
+        } catch (_) { }
       }
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(data));
@@ -109,7 +109,7 @@ function handleHttpRequest(req, res, { cmderInfo, rootDir, workspacesFile, lastS
   if (pathname === '/api/scripts') {
     // Ensure scripts dir exists
     if (!fs.existsSync(scriptsDir)) {
-      try { fs.mkdirSync(scriptsDir, { recursive: true }); } catch (_) {}
+      try { fs.mkdirSync(scriptsDir, { recursive: true }); } catch (_) { }
     }
 
     const loadScripts = () => {
@@ -117,7 +117,7 @@ function handleHttpRequest(req, res, { cmderInfo, rootDir, workspacesFile, lastS
       if (fs.existsSync(scriptsFile)) {
         try {
           list = JSON.parse(fs.readFileSync(scriptsFile, 'utf-8'));
-        } catch (_) {}
+        } catch (_) { }
       }
       // Also sync any standalone .bat/.cmd in user_scripts directory
       if (fs.existsSync(scriptsDir)) {
@@ -127,7 +127,7 @@ function handleHttpRequest(req, res, { cmderInfo, rootDir, workspacesFile, lastS
             const name = f.replace(/\.(bat|cmd)$/i, '');
             if (!list.some(s => s.name === name)) {
               let content = '';
-              try { content = fs.readFileSync(path.join(scriptsDir, f), 'utf-8'); } catch (_) {}
+              try { content = fs.readFileSync(path.join(scriptsDir, f), 'utf-8'); } catch (_) { }
               list.push({
                 id: name,
                 name: name,
@@ -203,8 +203,8 @@ function handleHttpRequest(req, res, { cmderInfo, rootDir, workspacesFile, lastS
 
         const batFile = path.join(scriptsDir, `${name}.bat`);
         const cmdFile = path.join(scriptsDir, `${name}.cmd`);
-        try { if (fs.existsSync(batFile)) fs.unlinkSync(batFile); } catch (_) {}
-        try { if (fs.existsSync(cmdFile)) fs.unlinkSync(cmdFile); } catch (_) {}
+        try { if (fs.existsSync(batFile)) fs.unlinkSync(batFile); } catch (_) { }
+        try { if (fs.existsSync(cmdFile)) fs.unlinkSync(cmdFile); } catch (_) { }
 
         let list = loadScripts();
         list = list.filter(s => s.name !== name && s.id !== name);
@@ -238,7 +238,7 @@ function handleHttpRequest(req, res, { cmderInfo, rootDir, workspacesFile, lastS
       if (vaultFile && fs.existsSync(vaultFile)) {
         try {
           return JSON.parse(fs.readFileSync(vaultFile, 'utf-8'));
-        } catch (_) {}
+        } catch (_) { }
       }
       return [];
     };
@@ -336,7 +336,7 @@ function handleHttpRequest(req, res, { cmderInfo, rootDir, workspacesFile, lastS
       if (snapshotsFile && fs.existsSync(snapshotsFile)) {
         try {
           return JSON.parse(fs.readFileSync(snapshotsFile, 'utf-8'));
-        } catch (_) {}
+        } catch (_) { }
       }
       return [];
     };
@@ -467,7 +467,7 @@ function handleHttpRequest(req, res, { cmderInfo, rootDir, workspacesFile, lastS
         let redirectUrl = proxyRes.headers.location;
         try {
           redirectUrl = new URL(redirectUrl, parsedTarget).href;
-        } catch (_) {}
+        } catch (_) { }
         res.writeHead(302, { 'Location': `/api/proxy?url=${encodeURIComponent(redirectUrl)}` });
         res.end();
         return;

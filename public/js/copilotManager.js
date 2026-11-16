@@ -26,16 +26,19 @@ let btnGo = null;
 let btnInject = null;
 let statusTrigger = null;
 
-/**
- * Checks whether the Browser split panel is currently visible
- */
+const SHORTCUTS = {
+  'chatgpt': 'https://chatgpt.com',
+  'devdocs': 'https://devdocs.io',
+  'google': 'https://www.google.com',
+  'github': 'https://github.com',
+  'youtube': 'https://youtube.com',
+  'localhost': 'http://localhost:3000'
+};
+
 export function isCopilotOpen() {
   return isOpen;
 }
 
-/**
- * Returns current state for workspace/session persistence
- */
 export function getCopilotState() {
   return {
     isOpen,
@@ -44,9 +47,6 @@ export function getCopilotState() {
   };
 }
 
-/**
- * Restores state from persistent storage or workspace
- */
 export function restoreCopilotState(savedState) {
   if (!savedState) return;
   if (savedState.width && panelEl) {
@@ -60,9 +60,6 @@ export function restoreCopilotState(savedState) {
   }
 }
 
-/**
- * Toggles the Web Browser split panel
- */
 export function toggleCopilotPanel(forceState) {
   isOpen = typeof forceState === 'boolean' ? forceState : !isOpen;
 
@@ -85,9 +82,6 @@ export function toggleCopilotPanel(forceState) {
   triggerTerminalRefit();
 }
 
-/**
- * Re-dimensions all active terminal instances to fit remaining viewport
- */
 function triggerTerminalRefit() {
   setTimeout(() => {
     state.tabs.forEach((tab) => {
@@ -95,29 +89,17 @@ function triggerTerminalRefit() {
         if (tab.fitAddon) {
           tab.fitAddon.fit();
         }
-      } catch (_) { }
+      } catch (_) {}
     });
   }, 50);
 }
 
-/**
- * Navigates embedded iframe to designated target URL
- */
 export function navigateBrowser(rawTarget, addToHistory = true) {
   if (!rawTarget) return;
 
   let target = rawTarget.trim();
-
-  const SHORTCUTS = {
-    'chatgpt': 'https://chatgpt.com',
-    'devdocs': 'https://devdocs.io',
-    'google': 'https://www.google.com',
-    'github': 'https://github.com',
-    'youtube': 'https://youtube.com',
-    'localhost': 'http://localhost:3000'
-  };
-
   const lower = target.toLowerCase();
+
   if (SHORTCUTS[lower]) {
     target = SHORTCUTS[lower];
   } else if (!/^https?:\/\//i.test(target)) {
@@ -154,12 +136,9 @@ export function navigateBrowser(rawTarget, addToHistory = true) {
 
   try {
     localStorage.setItem('browser_last_url', target);
-  } catch (_) { }
+  } catch (_) {}
 }
 
-/**
- * Opens the current URL in an external browser tab with noopener
- */
 export function popoutExternalBrowser(targetUrl) {
   const url = targetUrl || currentUrl || 'https://google.com';
   const a = document.createElement('a');
@@ -176,9 +155,6 @@ function updateNavButtonStates() {
   if (btnForward) btnForward.disabled = historyIndex >= historyStack.length - 1;
 }
 
-/**
- * Injects command snippet directly into active Cmder terminal tab
- */
 export function injectCommandToTerminal(command) {
   if (!command || !command.trim()) return;
 
@@ -200,10 +176,6 @@ export function injectCommandToTerminal(command) {
     }
   }
 }
-
-// ============================================================================
-// Drag Resizer Implementation
-// ============================================================================
 
 function initResizer() {
   if (!resizerEl || !panelEl) return;
@@ -237,7 +209,7 @@ function initResizer() {
 
       try {
         localStorage.setItem('browser_width', panelEl.style.width);
-      } catch (_) { }
+      } catch (_) {}
 
       triggerTerminalRefit();
     };
@@ -248,10 +220,6 @@ function initResizer() {
 
   resizerEl.addEventListener('mousedown', onMouseDown);
 }
-
-// ============================================================================
-// Initialization Entry Point
-// ============================================================================
 
 export function initCopilotManager() {
   panelEl = document.getElementById('copilotPanel');
@@ -280,9 +248,8 @@ export function initCopilotManager() {
       currentUrl = savedUrl;
       if (urlInputEl) urlInputEl.value = currentUrl;
     }
-  } catch (_) { }
+  } catch (_) {}
 
-  // Toggle button bindings
   if (btnToggle) {
     btnToggle.addEventListener('click', () => toggleCopilotPanel());
   }
@@ -293,12 +260,10 @@ export function initCopilotManager() {
     statusTrigger.addEventListener('click', () => toggleCopilotPanel());
   }
 
-  // Popout external browser button
   if (btnPopout) {
     btnPopout.addEventListener('click', () => popoutExternalBrowser(currentUrl));
   }
 
-  // URL navigation input & Go button
   if (urlInputEl) {
     urlInputEl.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
@@ -313,7 +278,6 @@ export function initCopilotManager() {
     });
   }
 
-  // Back, Forward, Reload navigation
   if (btnBack) {
     btnBack.addEventListener('click', () => {
       if (historyIndex > 0) {
@@ -338,14 +302,12 @@ export function initCopilotManager() {
     });
   }
 
-  // Iframe load complete
   if (iframeEl) {
     iframeEl.addEventListener('load', () => {
       if (loaderEl) loaderEl.classList.add('hidden');
     });
   }
 
-  // Command injection footer
   if (btnInject) {
     btnInject.addEventListener('click', () => {
       if (injectInputEl) injectCommandToTerminal(injectInputEl.value);
@@ -360,6 +322,5 @@ export function initCopilotManager() {
     });
   }
 
-  // Initialize drag resizer
   initResizer();
 }
