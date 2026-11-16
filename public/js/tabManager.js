@@ -106,6 +106,170 @@ export function createTab(cwd = '', title = '') {
 }
 
 /**
+ * Creates a dedicated full-capability Web Browser Tab.
+ * Allows embedding documentation, DevDocs, Localhost web apps, and developer portals.
+ * Integrates directly into Single Tab view and Split Grid (Alt+G)!
+ */
+export function createBrowserTab(initialUrl = 'https://devdocs.io', title = 'Browser') {
+  state.tabCounter++;
+  const tabId = `tab_browser_${Date.now()}_${state.tabCounter}`;
+  const tabIndex = state.tabs.size + 1;
+  const tabTitle = title || 'Browser';
+
+  // Create pane element
+  const paneEl = document.createElement('div');
+  paneEl.className = 'terminal-pane browser-tab-pane';
+  paneEl.id = `pane_${tabId}`;
+
+  // Build browser controls & iframe
+  paneEl.innerHTML = `
+    <div class="browser-tab-header">
+      <div class="browser-tab-nav-row">
+        <button class="browser-tab-btn" data-action="back" title="Back">◀</button>
+        <button class="browser-tab-btn" data-action="forward" title="Forward">▶</button>
+        <button class="browser-tab-btn" data-action="reload" title="Reload">🔄</button>
+        <div class="browser-tab-input-wrapper">
+          <input type="text" class="browser-tab-url-input" value="${initialUrl}" placeholder="Enter URL or search..." spellcheck="false" autocomplete="off">
+        </div>
+        <button class="browser-tab-go-btn" data-action="go">Go</button>
+        <button class="browser-tab-popout-btn" data-action="popout" title="Open in External Browser ↗">↗</button>
+      </div>
+      <div class="browser-tab-presets-row">
+        <button class="preset-pill active" data-url="https://devdocs.io">📚 DevDocs</button>
+        <button class="preset-pill" data-url="https://duckduckgo.com">🔍 DuckDuckGo</button>
+        <button class="preset-pill" data-url="https://github.com">🐙 GitHub</button>
+        <button class="preset-pill" data-url="http://localhost:3000">💻 Localhost:3000</button>
+        <button class="preset-pill" data-url="http://localhost:8080">💻 Localhost:8080</button>
+        <button class="preset-pill" data-url="https://chatgpt.com">🤖 ChatGPT</button>
+      </div>
+    </div>
+    <div class="browser-tab-content">
+      <iframe class="browser-tab-iframe" sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals" src="/api/proxy?url=${encodeURIComponent(initialUrl)}"></iframe>
+    </div>
+  `;
+
+  terminalViewportEl.appendChild(paneEl);
+
+  // Tab Item in Header
+  const tabEl = document.createElement('div');
+  tabEl.className = 'tab-item tab-item-browser';
+  tabEl.id = `tab_btn_${tabId}`;
+  tabEl.innerHTML = `
+    <span class="tab-badge">${tabIndex}</span>
+    <span class="tab-title" title="Double click to rename">🌐 ${tabTitle}</span>
+    <span class="tab-close" title="Close tab">×</span>
+  `;
+
+  tabEl.addEventListener('click', (e) => {
+    if (e.target.classList.contains('tab-close')) return;
+    switchTab(tabId);
+  });
+
+  tabEl.querySelector('.tab-close').addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeTab(tabId);
+  });
+
+  setupTabRename(tabEl, tabId, `🌐 ${tabTitle}`);
+  tabsListEl.appendChild(tabEl);
+
+  // Wire up navigation controls within this browser pane
+  const iframeEl = paneEl.querySelector('.browser-tab-iframe');
+  const urlInput = paneEl.querySelector('.browser-tab-url-input');
+  const navHistory = [initialUrl];
+  let historyIdx = 0;
+
+  const navigateTo = (rawTarget, addToHistory = true) => {
+    if (!rawTarget) return;
+    let target = rawTarget.trim();
+    if (target.includes('chatgpt.com') || target.includes('openai.com')) {
+      target = 'https://chatgpt.com';
+    } else if (!/^https?:\/\//i.test(target)) {
+      if (target.includes(' ') || !target.includes('.')) {
+        target = `https://duckduckgo.com/?q=${encodeURIComponent(target)}`;
+      } else {
+        target = `https://${target}`;
+      }
+    }
+
+    urlInput.value = target;
+    const isLocal = target.includes('localhost') || target.includes('127.0.0.1');
+    iframeEl.src = isLocal ? target : `/api/proxy?url=${encodeURIComponent(target)}`;
+
+    if (addToHistory) {
+      navHistory.splice(historyIdx + 1);
+      navHistory.push(target);
+      historyIdx = navHistory.length - 1;
+    }
+
+    // Update preset pills
+    paneEl.querySelectorAll('.preset-pill').forEach(pill => {
+      if (pill.dataset.url && target.startsWith(pill.dataset.url)) {
+        pill.classList.add('active');
+      } else {
+        pill.classList.remove('active');
+      }
+    });
+  };
+
+  paneEl.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    const action = btn.dataset.action;
+    if (action === 'go') {
+      navigateTo(urlInput.value, true);
+    } else if (action === 'back') {
+      if (historyIdx > 0) {
+        historyIdx--;
+        navigateTo(navHistory[historyIdx], false);
+      }
+    } else if (action === 'forward') {
+      if (historyIdx < navHistory.length - 1) {
+        historyIdx++;
+        navigateTo(navHistory[historyIdx], false);
+      }
+    } else if (action === 'reload') {
+      navigateTo(urlInput.value, false);
+    } else if (action === 'popout') {
+      const a = document.createElement('a');
+      a.href = urlInput.value || 'https://devdocs.io';
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } else if (btn.classList.contains('preset-pill') && btn.dataset.url) {
+      navigateTo(btn.dataset.url, true);
+    }
+  });
+
+  urlInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      navigateTo(urlInput.value, true);
+    }
+  });
+
+  // Store tab data
+  const tabData = {
+    id: tabId,
+    type: 'browser',
+    title: tabTitle,
+    url: initialUrl,
+    element: paneEl,
+    tabEl
+  };
+
+  state.tabs.set(tabId, tabData);
+  updateTabBadges();
+  switchTab(tabId);
+  if (state.isGridMode) applyGridLayout();
+  autoSaveSession();
+
+  return tabId;
+}
+
+/**
  * Switch active visible tab
  */
 export function switchTab(tabId) {
@@ -158,7 +322,7 @@ export function closeTab(tabId, fromExit = false) {
   const tab = state.tabs.get(tabId);
   if (!tab) return;
 
-  if (!fromExit) {
+  if (!fromExit && tab.type !== 'browser') {
     sendWs({ type: 'close', tabId });
   }
 

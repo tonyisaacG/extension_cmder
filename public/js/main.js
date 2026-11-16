@@ -2,7 +2,7 @@
  * Cmder Multi-Tab Container — Application Entry Point
  */
 import { state, sendWs, flushWsQueue } from './state.js';
-import { createTab, switchTab, closeTab, navigateTab, openInFolder, updateTabDisplay, updateStatusBar } from './tabManager.js';
+import { createTab, createBrowserTab, switchTab, closeTab, navigateTab, openInFolder, updateTabDisplay, updateStatusBar } from './tabManager.js';
 import { toggleBroadcast, executeBroadcast } from './broadcast.js';
 import { toggleGridLayout } from './grid.js';
 import { toggleHelpModal } from './helpModal.js';
@@ -16,6 +16,7 @@ import { initCopilotManager } from './copilotManager.js';
 // DOM Controls
 const btnAddTab = document.getElementById('btnAddTab');
 const btnOpenFolderTab = document.getElementById('btnOpenFolderTab');
+const btnAddBrowserTab = document.getElementById('btnAddBrowserTab');
 const btnOpenScripts = document.getElementById('btnOpenScripts');
 const btnOpenVault = document.getElementById('btnOpenVault');
 const btnToggleBroadcast = document.getElementById('btnToggleBroadcast');
@@ -165,6 +166,7 @@ function applyWorkspace(tabsToOpen) {
 // 3. Bind UI Event Listeners
 btnAddTab.addEventListener('click', () => createTab());
 btnOpenFolderTab.addEventListener('click', openInFolder);
+if (btnAddBrowserTab) btnAddBrowserTab.addEventListener('click', () => createBrowserTab());
 if (btnOpenScripts) btnOpenScripts.addEventListener('click', () => toggleScriptsModal());
 if (btnOpenVault) btnOpenVault.addEventListener('click', () => toggleVaultModal());
 btnToggleBroadcast.addEventListener('click', toggleBroadcast);

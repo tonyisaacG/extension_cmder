@@ -482,9 +482,9 @@ function handleHttpRequest(req, res, { cmderInfo, rootDir, workspacesFile, lastS
             <span class="badge">🤖 ChatGPT Companion</span>
             <h2>Official ChatGPT Session</h2>
             <p>ChatGPT employs Cloudflare anti-bot verification and authentication cookies that require a direct browser window.</p>
-            <button class="btn" onclick="window.open('https://chatgpt.com', 'ChatGPT_Sidecar', 'width=540,height=880,left=' + (screen.width - 560) + ',top=0')">
-              👉 Open ChatGPT Companion Window ↗
-            </button>
+            <a class="btn" href="https://chatgpt.com" target="_blank" rel="noopener noreferrer">
+              👉 Open Official ChatGPT Window ↗
+            </a>
             <p class="tip">Opens in a dedicated side-by-side app window with your full account and chat history.</p>
           </div>
         </body>

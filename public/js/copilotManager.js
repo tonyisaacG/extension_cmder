@@ -106,13 +106,16 @@ export function switchCopilotMode(mode) {
 }
 
 /**
- * Opens official ChatGPT in a dedicated snapped companion window
+ * Opens official ChatGPT with clean opener stripping to prevent COOP / ERR_BLOCKED_BY_RESPONSE
  */
 export function openOfficialGptWindow() {
-  const w = 540;
-  const h = 880;
-  const left = Math.max(0, (window.screen.availWidth || 1920) - w);
-  window.open('https://chatgpt.com', 'ChatGPT_Sidecar', `width=${w},height=${h},left=${left},top=0,menubar=no,toolbar=no`);
+  const link = document.createElement('a');
+  link.href = 'https://chatgpt.com';
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
 }
 
 /**
