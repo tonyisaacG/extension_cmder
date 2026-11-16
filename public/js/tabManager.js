@@ -136,7 +136,7 @@ export function createBrowserTab(initialUrl = 'https://devdocs.io', title = 'Bro
       </div>
     </div>
     <div class="browser-tab-content">
-      <iframe class="browser-tab-iframe" sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals" src="/api/proxy?url=${encodeURIComponent(initialUrl)}"></iframe>
+      <iframe class="browser-tab-iframe" src="/api/proxy?url=${encodeURIComponent(initialUrl)}"></iframe>
     </div>
   `;
 
@@ -171,12 +171,27 @@ export function createBrowserTab(initialUrl = 'https://devdocs.io', title = 'Bro
   const navHistory = [initialUrl];
   let historyIdx = 0;
 
+  const SHORTCUTS = {
+    'chatgpt': 'https://chatgpt.com',
+    'devdocs': 'https://devdocs.io',
+    'google': 'https://www.google.com',
+    'github': 'https://github.com',
+    'youtube': 'https://youtube.com',
+    'localhost': 'http://localhost:3000'
+  };
+
   const navigateTo = (rawTarget, addToHistory = true) => {
     if (!rawTarget) return;
     let target = rawTarget.trim();
-    if (!/^https?:\/\//i.test(target)) {
-      if (target.includes(' ') || !target.includes('.')) {
-        target = `https://duckduckgo.com/?q=${encodeURIComponent(target)}`;
+    const lower = target.toLowerCase();
+
+    if (SHORTCUTS[lower]) {
+      target = SHORTCUTS[lower];
+    } else if (!/^https?:\/\//i.test(target)) {
+      if (target.startsWith('localhost:')) {
+        target = `http://${target}`;
+      } else if (target.includes(' ') || !target.includes('.')) {
+        target = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(target)}`;
       } else {
         target = `https://${target}`;
       }

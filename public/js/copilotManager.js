@@ -95,7 +95,7 @@ function triggerTerminalRefit() {
         if (tab.fitAddon) {
           tab.fitAddon.fit();
         }
-      } catch (_) {}
+      } catch (_) { }
     });
   }, 50);
 }
@@ -108,10 +108,23 @@ export function navigateBrowser(rawTarget, addToHistory = true) {
 
   let target = rawTarget.trim();
 
-  // If user typed search terms without protocol or dot
-  if (!/^https?:\/\//i.test(target)) {
-    if (target.includes(' ') || !target.includes('.')) {
-      target = `https://duckduckgo.com/?q=${encodeURIComponent(target)}`;
+  const SHORTCUTS = {
+    'chatgpt': 'https://chatgpt.com',
+    'devdocs': 'https://devdocs.io',
+    'google': 'https://www.google.com',
+    'github': 'https://github.com',
+    'youtube': 'https://youtube.com',
+    'localhost': 'http://localhost:3000'
+  };
+
+  const lower = target.toLowerCase();
+  if (SHORTCUTS[lower]) {
+    target = SHORTCUTS[lower];
+  } else if (!/^https?:\/\//i.test(target)) {
+    if (target.startsWith('localhost:')) {
+      target = `http://${target}`;
+    } else if (target.includes(' ') || !target.includes('.')) {
+      target = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(target)}`;
     } else {
       target = `https://${target}`;
     }
@@ -141,7 +154,7 @@ export function navigateBrowser(rawTarget, addToHistory = true) {
 
   try {
     localStorage.setItem('browser_last_url', target);
-  } catch (_) {}
+  } catch (_) { }
 }
 
 /**
@@ -224,7 +237,7 @@ function initResizer() {
 
       try {
         localStorage.setItem('browser_width', panelEl.style.width);
-      } catch (_) {}
+      } catch (_) { }
 
       triggerTerminalRefit();
     };
@@ -267,7 +280,7 @@ export function initCopilotManager() {
       currentUrl = savedUrl;
       if (urlInputEl) urlInputEl.value = currentUrl;
     }
-  } catch (_) {}
+  } catch (_) { }
 
   // Toggle button bindings
   if (btnToggle) {

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
   <link rel="stylesheet" href="/xterm/xterm/css/xterm.css">
   <link rel="stylesheet" href="/style.css">
 </head>
+
 <body>
   <!-- Header Bar -->
   <header class="app-header">
@@ -101,7 +103,8 @@
   <div class="broadcast-bar hidden" id="broadcastBar">
     <div class="broadcast-inner">
       <span class="broadcast-tag">⚡ BROADCAST COMMAND</span>
-      <input type="text" id="broadcastInput" placeholder="Type command to run across selected tabs (e.g. git pull)..." autocomplete="off">
+      <input type="text" id="broadcastInput" placeholder="Type command to run across selected tabs (e.g. git pull)..."
+        autocomplete="off">
       <div class="broadcast-targets" id="broadcastTargets">
         <label><input type="checkbox" id="chkAllTabs" checked> All Tabs</label>
       </div>
@@ -152,13 +155,14 @@
           <div class="copilot-spinner"></div>
           <span>Loading page...</span>
         </div>
-        <iframe class="copilot-iframe" id="copilotIframe" sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals" src="about:blank"></iframe>
+        <iframe class="copilot-iframe" id="copilotIframe" src="about:blank"></iframe>
       </div>
 
       <!-- Quick Command Injection Footer -->
       <div class="copilot-quick-footer">
         <span class="quick-footer-icon" title="Quick Shell Injection">⚡</span>
-        <input type="text" class="quick-inject-input" id="copilotInjectInput" placeholder="Paste command to run in active Cmder tab..." autocomplete="off">
+        <input type="text" class="quick-inject-input" id="copilotInjectInput"
+          placeholder="Paste command to run in active Cmder tab..." autocomplete="off">
         <button class="quick-inject-btn" id="copilotBtnInject" title="Run in Active Cmder Tab">▶ Run</button>
       </div>
     </aside>
@@ -192,12 +196,13 @@
         <button class="modal-close" id="btnCloseScripts" title="Close (Esc)">✕</button>
       </div>
       <div class="modal-body scripts-modal-body">
-        
+
         <!-- Search and Action Bar -->
         <div class="scripts-top-bar">
           <div class="scripts-search-wrapper">
             <span class="search-icon">🔍</span>
-            <input type="text" id="scriptsSearchInput" placeholder="Search scripts or type name to run (Enter executes top match)..." autocomplete="off">
+            <input type="text" id="scriptsSearchInput"
+              placeholder="Search scripts or type name to run (Enter executes top match)..." autocomplete="off">
           </div>
           <button class="btn-primary" id="btnAddNewScript">➕ New Script</button>
         </div>
@@ -217,11 +222,13 @@
           </div>
           <div class="editor-field">
             <label>Description (Purpose / Notes):</label>
-            <input type="text" id="inputScriptDesc" placeholder="e.g. Login to server with credentials and open session">
+            <input type="text" id="inputScriptDesc"
+              placeholder="e.g. Login to server with credentials and open session">
           </div>
           <div class="editor-field">
             <label>Batch Script Content (Executes in Cmder terminal):</label>
-            <textarea id="inputScriptContent" rows="6" placeholder="@echo off&#10;echo Connecting...&#10;ssh user@server.com"></textarea>
+            <textarea id="inputScriptContent" rows="6"
+              placeholder="@echo off&#10;echo Connecting...&#10;ssh user@server.com"></textarea>
           </div>
           <div class="editor-buttons">
             <button class="btn-primary" id="btnSaveScript">💾 Save Script</button>
@@ -249,12 +256,13 @@
         <button class="modal-close" id="btnCloseVault" title="Close (Esc)">✕</button>
       </div>
       <div class="modal-body scripts-modal-body">
-        
+
         <!-- Search and Action Bar -->
         <div class="scripts-top-bar">
           <div class="scripts-search-wrapper">
             <span class="search-icon">🔍</span>
-            <input type="text" id="vaultSearchInput" placeholder="Search abbreviation (e.g. 109, db) — Press Enter to Paste into Tab..." autocomplete="off">
+            <input type="text" id="vaultSearchInput"
+              placeholder="Search abbreviation (e.g. 109, db) — Press Enter to Paste into Tab..." autocomplete="off">
           </div>
           <button class="btn-primary" id="btnAddNewVaultItem">➕ New Secret / Note</button>
         </div>
@@ -314,24 +322,30 @@
           <h2>Session Snapshots & Buffer Memory (<kbd>Alt+M</kbd>)</h2>
         </div>
         <div class="modal-header-actions" style="display:flex; align-items:center; gap:8px;">
-          <button class="btn-secondary" id="btnModalClearSession" title="Clear Screen & Buffer (Alt+K)">🧹 Clear Screen</button>
+          <button class="btn-secondary" id="btnModalClearSession" title="Clear Screen & Buffer (Alt+K)">🧹 Clear
+            Screen</button>
           <button class="btn-secondary" id="btnModalResetSession" title="Reset Shell Process">🔄 Reset Shell</button>
           <button class="modal-close" id="btnCloseSnapshots" title="Close (Esc)">✕</button>
         </div>
       </div>
       <div class="modal-body scripts-modal-body">
-        
+
         <!-- Search and Snapshot Trigger Bar -->
         <div class="scripts-top-bar" style="flex-wrap: wrap; gap: 8px;">
           <div class="scripts-search-wrapper" style="flex: 1; min-width: 200px;">
             <span class="search-icon">🔍</span>
-            <input type="text" id="snapshotsSearchInput" placeholder="Search snapshots by title, path, or output content..." autocomplete="off">
+            <input type="text" id="snapshotsSearchInput"
+              placeholder="Search snapshots by title, path, or output content..." autocomplete="off">
           </div>
           <div style="display:flex; gap:6px; flex-wrap: wrap;">
-            <button class="btn-primary" id="btnSnapshotActiveTab" title="Capture active tab's full output and commands">📸 Snapshot Active</button>
-            <button class="btn-secondary" id="btnSnapshotAllTabs" title="Capture all tabs in workspace">📸 Snapshot All</button>
-            <button class="btn-secondary" id="btnExportActiveMd" title="Directly export active terminal buffer as Markdown (.md)">📝 Export MD</button>
-            <button class="btn-secondary" id="btnExportActiveImg" title="Directly export active terminal buffer as PNG Image (.png)">🖼️ Export Image</button>
+            <button class="btn-primary" id="btnSnapshotActiveTab"
+              title="Capture active tab's full output and commands">📸 Snapshot Active</button>
+            <button class="btn-secondary" id="btnSnapshotAllTabs" title="Capture all tabs in workspace">📸 Snapshot
+              All</button>
+            <button class="btn-secondary" id="btnExportActiveMd"
+              title="Directly export active terminal buffer as Markdown (.md)">📝 Export MD</button>
+            <button class="btn-secondary" id="btnExportActiveImg"
+              title="Directly export active terminal buffer as PNG Image (.png)">🖼️ Export Image</button>
             <button class="btn-secondary" id="btnShowSnapshotForm" title="Custom snapshot title">⚙️ Custom...</button>
           </div>
         </div>
@@ -382,12 +396,13 @@
         <button class="modal-close" id="btnCloseHelp" title="Close (Esc)">✕</button>
       </div>
       <div class="modal-body">
-        
+
         <!-- Section 1: Keyboard Abbreviations / Shortcuts -->
         <div class="guide-section">
           <h3>⚡ Keyboard Shortcuts & Abbreviations (Browser Friendly)</h3>
           <p style="font-size:11px; color:#2ecc71; margin-bottom:8px;">
-            💡 <b>Note:</b> We use <code>Alt + Key</code> shortcuts so they <b>never conflict</b> with Chrome, Edge, or Windows browser tabs!
+            💡 <b>Note:</b> We use <code>Alt + Key</code> shortcuts so they <b>never conflict</b> with Chrome, Edge, or
+            Windows browser tabs!
           </p>
           <table class="shortcuts-table">
             <thead>
@@ -411,7 +426,8 @@
               <tr>
                 <td><kbd>Ctrl</kbd> + <kbd>Q</kbd>, <kbd>R</kbd>, <kbd>W</kbd>, etc.</td>
                 <td><b>Cmder Native</b></td>
-                <td>All Ctrl keys (Ctrl+Q quit pager/branches, Ctrl+R history search, Ctrl+W erase word) pass directly to Cmder!</td>
+                <td>All Ctrl keys (Ctrl+Q quit pager/branches, Ctrl+R history search, Ctrl+W erase word) pass directly
+                  to Cmder!</td>
               </tr>
               <tr>
                 <td><kbd>Alt</kbd> + <kbd>T</kbd></td>
@@ -479,8 +495,11 @@
             You can save server logins, credentials, SSH commands, or dev scripts in the app:
           </p>
           <ul style="font-size:12px; margin-left: 18px; color: #ccc; line-height: 1.6;">
-            <li><b>In Terminal:</b> Type <code>run_c</code> to list all saved scripts. Type <code>run_c &lt;name&gt;</code> to execute!</li>
-            <li><b>In UI:</b> Click <b>Scripts</b> in the header or press <kbd>Alt + S</kbd> to search, get suggestions, and run with 1-click.</li>
+            <li><b>In Terminal:</b> Type <code>run_c</code> to list all saved scripts. Type
+              <code>run_c &lt;name&gt;</code> to execute!
+            </li>
+            <li><b>In UI:</b> Click <b>Scripts</b> in the header or press <kbd>Alt + S</kbd> to search, get suggestions,
+              and run with 1-click.</li>
           </ul>
         </div>
 
@@ -488,22 +507,27 @@
         <div class="guide-section">
           <h3>📁 Managing Multiple Project Folders</h3>
           <p>
-            Click the <span class="badge-icon">📁</span> button in the top bar to open a tab directly in any folder on your PC.
-            Pressing <kbd>Alt + T</kbd> or clicking <kbd>+</kbd> automatically opens new tabs in the <b>same folder</b> as your current tab.
+            Click the <span class="badge-icon">📁</span> button in the top bar to open a tab directly in any folder on
+            your PC.
+            Pressing <kbd>Alt + T</kbd> or clicking <kbd>+</kbd> automatically opens new tabs in the <b>same folder</b>
+            as your current tab.
           </p>
         </div>
 
         <div class="guide-section">
           <h3>⚡ Broadcast Mode (Inter-Tab Connection)</h3>
           <p>
-            Press <kbd>Alt + B</kbd> to open the broadcast bar. Type any command (such as <code>git pull</code>, <code>npm test</code>, or <code>dir</code>) and press <b>Enter</b> to execute it across all your open tabs simultaneously!
+            Press <kbd>Alt + B</kbd> to open the broadcast bar. Type any command (such as <code>git pull</code>,
+            <code>npm test</code>, or <code>dir</code>) and press <b>Enter</b> to execute it across all your open tabs
+            simultaneously!
           </p>
         </div>
 
         <div class="guide-section">
           <h3>💾 Automatic Tab Caching (Session Memory)</h3>
           <p>
-            Your open tabs, folder paths, and custom names are <b>automatically saved</b> in real-time. Whenever you close and reopen the app, all your tabs reload right where you left off.
+            Your open tabs, folder paths, and custom names are <b>automatically saved</b> in real-time. Whenever you
+            close and reopen the app, all your tabs reload right where you left off.
           </p>
         </div>
 
@@ -519,4 +543,5 @@
   <script src="/xterm/addon-fit/lib/addon-fit.js"></script>
   <script type="module" src="/js/main.js"></script>
 </body>
+
 </html>
