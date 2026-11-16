@@ -1,7 +1,7 @@
 /**
  * Cmder Multi-Tab Container — Application Entry Point
  */
-import { state, sendWs } from './state.js';
+import { state, sendWs, flushWsQueue } from './state.js';
 import { createTab, switchTab, closeTab, navigateTab, openInFolder, updateTabDisplay, updateStatusBar } from './tabManager.js';
 import { toggleBroadcast, executeBroadcast } from './broadcast.js';
 import { toggleGridLayout } from './grid.js';
@@ -73,6 +73,8 @@ function initWebSocket() {
         sendWs({ type: 'attach', tabs: tabList });
       }
     }
+    // Flush any pending tab creation or commands queued while reconnecting
+    flushWsQueue();
   };
 
   state.ws.onmessage = (event) => {
