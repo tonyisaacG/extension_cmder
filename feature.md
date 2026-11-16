@@ -41,11 +41,10 @@
     - Bound `credential.https://github.com.username tonyisaacG` for zero-friction, instant remote pushing/pulling.
 
 
-[x] Embedded AI Copilot & Web Split-Panel Engine (Completed)
+[x] Embedded Web Browser & Split-Panel Engine (Completed - Option B)
     - Specification: docs/12_EMBEDDED_AI_COPILOT_AND_WEB_PANEL.md
-    - Architecture: Resizable, collapsible split-panel on the right side of the container (triggered by Alt+C or header button).
-    - Persistent Session: Remains open while switching between terminal tabs without reloading.
-    - Iframe CORS Proxy: Backend endpoint (/api/proxy) stripping X-Frame-Options to allow embedding of ChatGPT, DevDocs, Google, and documentation.
-    - Presets & Quick Bookmarks: 1-click pills for ChatGPT, Google Dev, DevDocs.io, GitHub, and Localhost.
-    - 1-Click Code Injection: Execute code snippets directly into the active Cmder terminal tab.
-    - Snapshot & Workspace Integration: Automatically records Copilot visibility and URL in session snapshots. 
+    - Architecture: Resizable, collapsible browser split-panel on the right side of the container (triggered by Alt+C or header button).
+    - Dedicated Browser Tabs: In-tab browser view (via 🌐 button in tab bar) supporting single tab or Split Grid view (Alt+G).
+    - Iframe CORS Proxy: Backend endpoint (/api/proxy) with <base href> injection for live developer documentation (DevDocs, Localhost, DuckDuckGo HTML).
+    - 1-Click Popout (↗): Opens external-protected sites (like official ChatGPT or Google) in the default browser with noopener/noreferrer to avoid ERR_BLOCKED_BY_RESPONSE.
+    - Future Roadmap (Option A): Migration to Electron WebContentsView for full native in-app Chromium embedding. 

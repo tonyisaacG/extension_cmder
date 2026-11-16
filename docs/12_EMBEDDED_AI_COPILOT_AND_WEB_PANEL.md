@@ -1,7 +1,7 @@
 # 🤖 Chapter 12: Embedded AI Copilot & Web Split-Panel Engine
 
-**Document Version:** 1.0.0  
-**Status:** 🟡 Architectural Specification & Planning  
+**Document Version:** 1.1.0  
+**Status:** 🟢 Complete (Option B Popout Fallback & Browser Tab Integrated)  
 **Feature ID:** `[FEAT-12]` / `[FR-13]`  
 **Author:** Senior Principal Architect & Product Owner  
 **Repository:** `extension_cmder`  
@@ -158,17 +158,24 @@ When a developer saves a session snapshot (`snapshots.json`) or a named workspac
 
 ---
 
-## 7. Delivery Roadmap
+## 7. Delivery Checklist & Future Electron Migration Path
 
-* [ ] **Phase 1: Layout & DOM Shell (`public/index.html`, `public/style.css`)**  
-  Add split container layout, header trigger button, resizable dragger bar, and panel container.
-* [ ] **Phase 2: Backend Streaming Proxy (`server/routes.js`)**  
-  Implement `/api/proxy` stripping iframe denial headers and enabling live embedding.
-* [ ] **Phase 3: Copilot Manager Module (`public/js/copilotManager.js`)**  
-  Implement toggle logic, URL bar navigation, preset bookmarks, and terminal injection.
-* [ ] **Phase 4: Keyboard Dispatcher & xterm Re-fit (`public/js/shortcuts.js`, `public/js/main.js`)**  
-  Bind `Alt + C` and hook into `fitAddon.fit()` on panel resize.
-* [ ] **Phase 5: Snapshot & Persistence Sync**  
-  Serialize Copilot state into `last_session.json` and `snapshots.json`.
-* [ ] **Phase 6: Verification & Documentation Sync**  
-  Node syntax verification (`node -c`), update `FEATURE_AND_BUG_TRACKER.md`, `00_PRODUCT_REQUIREMENTS_DOCUMENT.md`, `feature.md`, and `PLAN.md`.
+* [x] **Phase 1: Layout & DOM Shell (`public/index.html`, `public/style.css`)**  
+  Added split container layout, header trigger button (`🌐 Browser`), resizable dragger bar, and web panel container.
+* [x] **Phase 2: Backend Streaming Proxy (`server/routes.js`)**  
+  Implemented `/api/proxy` stripping iframe denial headers and injecting `<base href>` for live documentation.
+* [x] **Phase 3: Browser Manager Module (`public/js/copilotManager.js`)**  
+  Implemented toggle logic, URL bar navigation, smart shortcuts (`chatgpt`, `devdocs`, `google`), and terminal injection.
+* [x] **Phase 4: Dedicated Browser Tabs (`public/js/tabManager.js`)**  
+  Implemented `createBrowserTab` allowing users to open full web browser tabs in single view or split grid (`Alt + G`).
+* [x] **Phase 5: COOP & External Popout Resolution**  
+  Added one-click `↗ Popout` button using `rel="noopener noreferrer"` preventing `ERR_BLOCKED_BY_RESPONSE` for protected sites (ChatGPT, Google).
+* [x] **Phase 6: Keyboard Dispatcher & xterm Re-fit (`public/js/shortcuts.js`, `public/js/main.js`)**  
+  Bound `Alt + C` and hooked into `fitAddon.fit()` on panel resize.
+* [x] **Phase 7: Verification & Documentation Sync**  
+  Syntax verified (`node -c`), all documentation files synchronized.
+
+### 🔮 Future Option A Roadmap: Electron `WebContentsView`
+When the project upgrades from the lightweight Node.js architecture to a native Electron application:
+* Replace the `<iframe>` element with Electron's `WebContentsView`.
+* Provides a real embedded Chromium engine that completely bypasses `X-Frame-Options` and `CSP` for top-level navigation, enabling 100% in-window rendering of ChatGPT, Google, and complex web apps with persistent login sessions.

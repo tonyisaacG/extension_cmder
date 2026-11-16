@@ -512,7 +512,7 @@ function handleHttpRequest(req, res, { cmderInfo, rootDir, workspacesFile, lastS
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #181818; color: #eee; padding: 32px; text-align: center; border-radius: 8px; margin: 20px;">
           <h3 style="color: #e74c3c; margin-bottom: 8px;">⚠️ Connection Failed</h3>
           <p style="color: #aaa; margin-bottom: 16px;">Could not connect to <code style="background: #252525; padding: 2px 6px; border-radius: 4px; color: #2ecc71;">${rawTarget}</code>: ${err.message}</p>
-          <a href="${rawTarget}" target="_blank" style="display: inline-block; padding: 8px 16px; background: #2ecc71; color: #111; text-decoration: none; border-radius: 4px; font-weight: bold;">Open in New Browser Window ↗</a>
+          <a href="${rawTarget}" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 8px 16px; background: #2ecc71; color: #111; text-decoration: none; border-radius: 4px; font-weight: bold;">Open in New Browser Window ↗</a>
         </div>
       `);
     });
